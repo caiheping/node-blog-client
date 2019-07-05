@@ -11,7 +11,7 @@
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="/login">退出登陆</el-dropdown-item>
-          <el-dropdown-item command="setting">设置</el-dropdown-item>
+          <el-dropdown-item command="setting">修改密码</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -39,6 +39,7 @@
 
 <script>
 import { rules } from '@/utils/validate'
+import { updatePwd } from '../../../../api/admin/user'
 export default {
   props: {
     title: {
@@ -52,10 +53,10 @@ export default {
       dialogFormVisible: false,
       rules: {
         newPwd: [
-          { required: true, validator: rules.validPwd, trigger: 'blur' }
+          { required: true, validator: rules.string, trigger: 'blur' }
         ],
         reNewPwd: [
-          { required: true, validator: rules.validPwd, trigger: 'blur' }
+          { required: true, validator: rules.string, trigger: 'blur' }
         ],
         originPwd: [
           { required: true, message: '请输入原始密码', trigger: 'blur' }
@@ -72,11 +73,20 @@ export default {
   methods: {
     // 提交修改密码表单
     submitForm (formName) {
+      let _this = this
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$refs[formName].resetFields()
+          let query = {
+            originPwd: _this.form.originPwd,
+            newPwd: _this.form.newPwd,
+            id: JSON.parse(sessionStorage.getItem('userInfo')).userId
+          }
+          console.log(_this.form)
+          updatePwd(query).then(res => {
+            console.log(res)
+          })
           this.dialogFormVisible = false
-          alert('submit!')
+          // this.$refs[formName].resetFields()
         } else {
           console.log('error submit!!')
           return false
@@ -91,6 +101,7 @@ export default {
     handleCommand (command) {
       if (command === '/login') {
         this.$router.replace('/login')
+        sessionStorage.clear()
       } else {
         this.dialogFormVisible = true
       }

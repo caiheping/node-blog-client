@@ -1,6 +1,38 @@
 <template>
   <div class="home">
-    <div class="top">
+    <div class="top" v-if="isAdmin">
+      <div class="item">
+        <div class="content">
+          <div class="itemLogo">
+            用户量
+          </div>
+          <div class="right">
+            <countTo class="num" :startVal='0' :endVal='353' :duration='2000'></countTo>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="content">
+          <div class="itemLogo">
+            文章数量
+          </div>
+          <div class="right">
+            <countTo class="num" :startVal='0' :endVal='353' :duration='2000'></countTo>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="content">
+          <div class="itemLogo">
+            文章类型
+          </div>
+          <div class="right">
+            <countTo class="num" :startVal='0' :endVal='3333' :duration='2000'></countTo>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="top" v-if="!isAdmin">
       <div class="item">
         <div class="content">
           <div class="itemLogo">
@@ -72,15 +104,33 @@
 
 <script>
 import countTo from 'vue-count-to'
+import { home } from '../../../api/admin/home'
 export default {
   data () {
     return {
       startVal: 0,
-      endVal: 2017
+      endVal: 2017,
+      isAdmin: false
     }
   },
   components: {
     countTo
+  },
+  methods: {
+    getDatas () {
+      console.log(JSON.parse(sessionStorage.getItem('userInfo')).userId)
+      home({ id: JSON.parse(sessionStorage.getItem('userInfo')).userId }).then(res => {
+        console.log(res)
+      })
+    }
+  },
+  mounted () {
+    if (JSON.parse(sessionStorage.getItem('userInfo')).level === 0) {
+      this.isAdmin = true
+    } else {
+      this.isAdmin = false
+    }
+    this.getDatas()
   }
 }
 </script>

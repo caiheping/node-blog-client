@@ -6,12 +6,12 @@
           <el-input v-model="form.username" autocomplete="off" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" autocomplete="off" placeholder="请输入密码"></el-input>
+          <el-input v-model="form.password" autocomplete="off" type="password" placeholder="请输入密码"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit('form')">确 定</el-button>
       </div>
     </el-dialog>
     <div class="top">
@@ -48,7 +48,7 @@
           align="center"
           width="120">
           <template slot-scope="scope">
-            <el-button @click="edit(scope.row)" type="text" class="edit">编辑</el-button>
+<!--            <el-button @click="edit(scope.row)" type="text" class="edit">编辑</el-button>-->
             <el-button @click="del(scope.row)" type="text" class="del">删除</el-button>
           </template>
         </el-table-column>
@@ -59,10 +59,10 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :page-sizes="[10, 20, 30, 50]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
@@ -70,10 +70,13 @@
 
 <script>
 import { rules } from '@/utils/validate'
+import { findUser, addUser, deleteUser } from '../../../api/admin/user'
 export default {
   data () {
     return {
-      currentPage: 5,
+      total: 0,
+      currentPage: 1,
+      pageSize: 10,
       fromObj: {
         username: ''
       },
@@ -85,37 +88,100 @@ export default {
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入用户名' }
         ],
         password: [
-          { required: true, validator: rules.validPwd, trigger: 'blur' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入密码' }
         ]
       },
       dialogFormVisible: false,
       formLabelWidth: '70px',
       form: {
+        id: null,
         username: '',
         password: ''
+      },
+      findQuery: {
+        page: 1,
+        limit: 10
       }
     }
   },
   methods: {
+    getDatas () {
+      findUser(this.findQuery).then(res => {
+        console.log(res)
+        this.total = res.data.count
+        this.tableData = res.data.rows
+      })
+    },
     closeDialog () {
       this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
     },
     add () {
+      this.form.id = null
       this.dialogFormVisible = true
     },
-    edit (row) {
-      console.log(row)
+    // edit (row) {
+    //   this.form.id = row.id
+    //   this.dialogFormVisible = true
+    // },
+    submit (formName) {
+      let _this = this
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          addUser(_this.form).then(res => {
+            console.log(res)
+            if (res.code === 0) {
+              _this.$message({
+                type: 'success',
+                message: res.data
+              })
+            }
+            _this.getDatas()
+          })
+          _this.dialogFormVisible = false
+        } else {
+          return false
+        }
+      })
     },
     del (row) {
-      console.log(row)
+      let _this = this
+      this.$confirm('是否继续删除用户?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteUser({ id: row.id }).then(res => {
+          if (res.code === 0) {
+            _this.$message({
+              type: 'success',
+              message: res.data
+            })
+            _this.getDatas()
+          }
+        })
+      }).catch(() => {
+        _this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.findQuery.limit = val
+      this.getDatas()
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
+      this.currentPage = val
+      this.findQuery.page = val
+      this.getDatas()
     }
+  },
+  mounted () {
+    this.getDatas()
   }
 }
 </script>

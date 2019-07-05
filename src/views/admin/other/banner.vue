@@ -85,10 +85,10 @@ export default {
       formLabelWidth: '100px',
       rules: {
         index: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入索引' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入索引' }
         ],
         url: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入url地址' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入url地址' }
         ]
       },
       form: {

@@ -51,11 +51,11 @@ function successState (response) {
     sessionStorage.setItem('isLogin', false)
     router.replace('/login')
   }
-  // 如果code不等于0，提升错误信息
+  // 如果code不等于0，提示错误信息
   if (response.code && response.code !== 0) {
     Message({
       type: 'error',
-      message: response.message
+      message: response.data
     })
   }
   return response
@@ -68,9 +68,7 @@ function httpRequest (url, method = 'GET', params = {}, contentType = '', isLoad
   }
   // 设置token
   if (process.env.NODE_ENV === 'development') {
-    url = baseUrl + url + '?token=' + sessionStorage.getItem('token')
-  } else {
-    url = url + '?token=' + sessionStorage.getItem('token')
+    url = baseUrl + url
   }
   method = method.toUpperCase()
   let httpDefault = {

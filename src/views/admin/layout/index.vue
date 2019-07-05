@@ -12,11 +12,11 @@
                 <svg-icon icon-class="home" class-name="icon"/>
                 <span slot="title">首页</span>
               </el-menu-item>
-              <el-menu-item index="userManagement">
+              <el-menu-item index="userManagement" v-if="isAdmin">
                 <svg-icon icon-class="userManagement" class-name="icon"/>
                 <span slot="title">用户管理</span>
               </el-menu-item>
-              <el-submenu index="article">
+              <el-submenu index="article" v-if="!isAdmin">
                 <template slot="title">
                   <svg-icon icon-class="article" class-name="icon"/>
                   <span slot="title">文章模块</span>
@@ -28,7 +28,7 @@
                   <span slot="title">技术杂谈</span>
                 </el-menu-item>
               </el-submenu>
-              <el-submenu index="user">
+              <el-submenu index="user" v-if="!isAdmin">
                 <template slot="title">
                   <svg-icon icon-class="user" class-name="icon"/>
                   <span slot="title">个人中心</span>
@@ -40,7 +40,7 @@
                   <span slot="title">个人笔记</span>
                 </el-menu-item>
               </el-submenu>
-              <el-submenu index="other">
+              <el-submenu index="other" v-if="!isAdmin">
                 <template slot="title">
                   <svg-icon icon-class="other" class-name="icon"/>
                   <span slot="title">其他</span>
@@ -101,7 +101,8 @@ import TagsView from './components/TagsView'
 export default {
   data () {
     return {
-      title: '小菜管理系统'
+      title: '小菜管理系统',
+      isAdmin: false
     }
   },
   components: {
@@ -111,7 +112,11 @@ export default {
     ThemePicker
   },
   mounted () {
-    console.log(this.$route)
+    if (JSON.parse(sessionStorage.getItem('userInfo')).level === 0) {
+      this.isAdmin = true
+    } else {
+      this.isAdmin = false
+    }
   }
 }
 </script>

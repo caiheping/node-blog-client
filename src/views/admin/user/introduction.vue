@@ -109,10 +109,10 @@ export default {
       formLabelWidth: '80px',
       rules: {
         title: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入技能' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入技能' }
         ],
         proficiency: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入技能熟练度' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入技能熟练度' }
         ]
       },
       form: {

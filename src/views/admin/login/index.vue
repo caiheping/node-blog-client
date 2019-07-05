@@ -37,7 +37,7 @@
           <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
         </el-form-item>
         <div class="bottom">
-          <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
+          <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
           <el-button @click="resetForm('loginForm')">重置</el-button>
         </div>
       </el-form>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-// import { loginApi } from '../../api/login'
+import { login } from '../../../api/admin/login'
 
 export default {
   data () {
@@ -76,25 +76,24 @@ export default {
   methods: {
     async submitForm (formName) {
       let _this = this
-      this.$router.push('/adminLayout/adminHome')
-      // this.$refs[formName].validate(valid => {
-      //   if (valid) {
-      //     loginApi(this.loginForm).then(res => {
-      //       if (res.code === 0) {
-      //         let userInfo = {
-      //           username: res.data.username,
-      //           userId: res.data.id,
-      //           avator: res.data.avator
-      //         }
-      //         sessionStorage.setItem('token', res.token)
-      //         sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
-      //         _this.$router.push('/adminLayout/adminHome')
-      //       }
-      //     })
-      //   } else {
-      //     return false
-      //   }
-      // })
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          login(this.loginForm).then(res => {
+            if (res.code === 0) {
+              let userInfo = {
+                username: res.data.username,
+                userId: res.data.id,
+                level: res.data.level,
+                avatar: res.data.avatar
+              }
+              sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+              _this.$router.push('/adminLayout/adminHome')
+            }
+          })
+        } else {
+          return false
+        }
+      })
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()

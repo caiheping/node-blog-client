@@ -97,10 +97,10 @@ export default {
       formLabelWidth: '120px',
       rules: {
         title: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入标题' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入标题' }
         ],
         content: [
-          { required: true, validator: rules.validPwd, trigger: 'blur', message: '请输入内容' }
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入内容' }
         ]
       },
       form: {
