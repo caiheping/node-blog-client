@@ -6,7 +6,7 @@
     -->
     <editor id="tinymceEditor" :init="tinymceInit" v-model="content" :key="tinymceFlag"></editor>
     <el-upload
-      action="//jsonplaceholder.typicode.com/posts/"
+      :action="uploadUrl"
       :on-success="insertImage"
       multiple
       style="display: none">
@@ -43,18 +43,19 @@ export default {
     return {
       tinymceFlag: 1,
       tinymceInit: {},
-      content: this.data ? this.data : ''
+      content: this.data ? this.data : '',
+      uploadUrl: '/uploadImg'
     }
   },
   methods: {
     // 插入图片至编辑器
     insertImage (res, file) {
-      let src = '' // 图片存储地址
-      console.log(file)
+      let src = res.data.url // 图片存储地址
       tinymce.execCommand('mceInsertContent', false, `<img src=${src}>`)
     }
   },
   created () {
+    this.uploadUrl = this.baseUrl + this.uploadUrl
     const that = this
     this.tinymceInit = {
       skin_url: '/tinymce/skins/ui/oxide',

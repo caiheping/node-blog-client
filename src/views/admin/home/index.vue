@@ -118,8 +118,8 @@ export default {
   },
   methods: {
     getDatas () {
-      console.log(JSON.parse(sessionStorage.getItem('userInfo')).userId)
-      home({ id: JSON.parse(sessionStorage.getItem('userInfo')).userId }).then(res => {
+      console.log(JSON.parse(sessionStorage.getItem('userInfo')).id)
+      home({ id: JSON.parse(sessionStorage.getItem('userInfo')).id }).then(res => {
         console.log(res)
       })
     }

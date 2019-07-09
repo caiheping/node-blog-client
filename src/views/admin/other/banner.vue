@@ -1,13 +1,13 @@
 <template>
   <div class="friendshipLinks">
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
       <el-form :model="form" ref="form" :rules="rules">
         <el-form-item label="图片索引" :label-width="formLabelWidth" prop="index">
           <el-input v-model="form.index" autocomplete="off" placeholder="请输入图片索引，如：1"></el-input>
         </el-form-item>
         <el-form-item label="链接地址" :label-width="formLabelWidth" prop="url">
           <el-upload
-            action="http://www.baidu.com"
+            :action="uploadUrl"
             :on-success="uploadSuccess"
             :on-error="uploadError"
             :show-file-list="false">
@@ -18,7 +18,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit('form')">确 定</el-button>
       </div>
     </el-dialog>
     <div class="top">
@@ -71,16 +71,16 @@
 
 <script>
 import { rules } from '@/utils/validate'
+import { findBanner, addBanner, deleteBanner, updateBanner } from '../../../api/admin/other'
 export default {
   data () {
     return {
+      uploadUrl: '/uploadImg',
+      title: '新增',
       fromObj: {
         index: ''
       },
-      tableData: [{
-        index: '2',
-        url: 'http://www.baidu.com'
-      }],
+      tableData: [],
       dialogFormVisible: false,
       formLabelWidth: '100px',
       rules: {
@@ -92,25 +92,127 @@ export default {
         ]
       },
       form: {
+        id: null,
         index: '',
-        url: require('../../../static/img/avater.jpg')
+        url: ''
       }
     }
   },
   methods: {
+    // 上传成功
+    uploadSuccess (response, file, fileList) {
+      this.form.url = response.data.url
+      console.log(response)
+      this.$message({
+        type: 'success',
+        message: '上传成功'
+      })
+    },
+    // 上传失败
+    uploadError (err, file, fileList) {
+      this.$message({
+        type: 'error',
+        message: '上传失败'
+      })
+      console.log(err)
+    },
     closeDialog () {
-      this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
+      this.form = {
+        id: null,
+        index: '',
+        url: ''
+      }
+    },
+    submit (formName) {
+      let _this = this
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          let query = {
+            url: _this.form.url,
+            index: _this.form.index
+          }
+          if (_this.form.id) {
+            query.id = _this.form.id
+            updateBanner(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          } else {
+            query.u_id = JSON.parse(sessionStorage.getItem('userInfo')).id
+            addBanner(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          }
+          _this.dialogFormVisible = false
+        } else {
+          return false
+        }
+      })
+    },
+    getDatas () {
+      let query = {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id
+      }
+      findBanner(query).then(res => {
+        console.log(res)
+        if (res.code === 0) {
+          this.tableData = res.data
+        }
+      })
     },
     add () {
+      this.form.id = null
+      this.title = '新增'
       this.dialogFormVisible = true
     },
     edit (row) {
-      console.log(row)
+      this.form.id = row.id
+      this.title = '修改'
+      this.form.index = row.index
+      this.form.url = row.url
+      this.dialogFormVisible = true
     },
     del (row) {
-      console.log(row)
+      let _this = this
+      this.$confirm('是否继续删除用户?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteBanner({ id: row.id }).then(res => {
+          if (res.code === 0) {
+            _this.$message({
+              type: 'success',
+              message: res.data
+            })
+            _this.getDatas()
+          }
+        })
+      }).catch(() => {
+        _this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
+  },
+  mounted () {
+    this.uploadUrl = this.baseUrl + this.uploadUrl
+    this.getDatas()
   }
 }
 </script>

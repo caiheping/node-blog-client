@@ -50,13 +50,13 @@ import { login } from '../../../api/admin/login'
 
 export default {
   data () {
-    var checkName = (rule, value, callback) => {
+    let checkName = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('用户名不能为空'))
       }
       callback()
     }
-    var validatePass = (rule, value, callback) => {
+    let validatePass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
       }
@@ -80,13 +80,7 @@ export default {
         if (valid) {
           login(this.loginForm).then(res => {
             if (res.code === 0) {
-              let userInfo = {
-                username: res.data.username,
-                userId: res.data.id,
-                level: res.data.level,
-                avatar: res.data.avatar
-              }
-              sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+              sessionStorage.setItem('userInfo', JSON.stringify(res.data.userInfo))
               _this.$router.push('/adminLayout/adminHome')
             }
           })

@@ -1,6 +1,6 @@
 <template>
   <div class="friendshipLinks">
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" @close="closeDialog">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible" @close="closeDialog">
       <el-form :model="form" ref="form" :rules="rules">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input v-model="form.title" autocomplete="off" placeholder="请输入标题"></el-input>
@@ -11,7 +11,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit('form')">确 定</el-button>
       </div>
     </el-dialog>
     <div class="top">
@@ -59,33 +59,20 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="page">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-      </el-pagination>
-    </div>
   </div>
 </template>
 
 <script>
 import { rules } from '@/utils/validate'
+import { findFriendshipLink, addFriendshipLink, deleteFriendshipLink, updateFriendshipLink } from '../../../api/admin/other'
 export default {
   data () {
     return {
-      currentPage: 1,
+      title: '新增',
       fromObj: {
         title: ''
       },
-      tableData: [{
-        title: '啦啦啦',
-        url: 'http://www.baidu.com'
-      }],
+      tableData: [],
       dialogFormVisible: false,
       formLabelWidth: '100px',
       rules: {
@@ -97,6 +84,7 @@ export default {
         ]
       },
       form: {
+        id: null,
         title: '',
         url: ''
       }
@@ -104,24 +92,100 @@ export default {
   },
   methods: {
     closeDialog () {
-      this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
+      this.form = {
+        id: null,
+        title: '',
+        url: ''
+      }
+    },
+    submit (formName) {
+      let _this = this
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          let query = {
+            url: _this.form.url,
+            title: _this.form.title
+          }
+          if (_this.form.id) {
+            query.id = _this.form.id
+            updateFriendshipLink(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          } else {
+            query.u_id = JSON.parse(sessionStorage.getItem('userInfo')).id
+            addFriendshipLink(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          }
+          _this.dialogFormVisible = false
+        } else {
+          return false
+        }
+      })
+    },
+    getDatas () {
+      let query = {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id
+      }
+      findFriendshipLink(query).then(res => {
+        if (res.code === 0) {
+          this.tableData = res.data
+        }
+      })
     },
     add () {
+      this.form.id = null
+      this.title = '新增'
       this.dialogFormVisible = true
     },
     edit (row) {
-      console.log(row)
+      this.form.id = row.id
+      this.title = '修改'
+      this.form.title = row.title
+      this.form.url = row.url
+      this.dialogFormVisible = true
     },
     del (row) {
-      console.log(row)
-    },
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
-    },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+      let _this = this
+      this.$confirm('是否继续删除用户?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteFriendshipLink({ id: row.id }).then(res => {
+          if (res.code === 0) {
+            _this.$message({
+              type: 'success',
+              message: res.data
+            })
+            _this.getDatas()
+          }
+        })
+      }).catch(() => {
+        _this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
+  },
+  mounted () {
+    this.getDatas()
   }
 }
 </script>
@@ -138,18 +202,6 @@ export default {
     .content{
       overflow: auto;
       margin-bottom: 50px;
-    }
-    .page{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      height: 50px;
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      z-index: 999;
     }
   }
 </style>

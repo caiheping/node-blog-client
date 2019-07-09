@@ -79,7 +79,7 @@ export default {
           let query = {
             originPwd: _this.form.originPwd,
             newPwd: _this.form.newPwd,
-            id: JSON.parse(sessionStorage.getItem('userInfo')).userId
+            id: JSON.parse(sessionStorage.getItem('userInfo')).id
           }
           console.log(_this.form)
           updatePwd(query).then(res => {

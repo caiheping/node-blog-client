@@ -1,6 +1,6 @@
 <template>
   <div class="userManagement">
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" @close="closeDialog" width="450px">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible" @close="closeDialog" width="450px">
       <el-form :model="form" ref="form" :rules="rules" :label-width="formLabelWidth">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" autocomplete="off" placeholder="请输入用户名"></el-input>
@@ -74,6 +74,7 @@ import { findUser, addUser, deleteUser } from '../../../api/admin/user'
 export default {
   data () {
     return {
+      title: '新增',
       total: 0,
       currentPage: 1,
       pageSize: 10,
@@ -113,17 +114,18 @@ export default {
       })
     },
     closeDialog () {
-      this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
+      this.form = {
+        id: null,
+        username: '',
+        password: ''
+      }
     },
     add () {
       this.form.id = null
+      this.title = '新增'
       this.dialogFormVisible = true
     },
-    // edit (row) {
-    //   this.form.id = row.id
-    //   this.dialogFormVisible = true
-    // },
     submit (formName) {
       let _this = this
       this.$refs[formName].validate(valid => {

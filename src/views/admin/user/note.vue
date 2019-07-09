@@ -11,7 +11,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit('form')">确 定</el-button>
       </div>
     </el-dialog>
     <div class="top">
@@ -70,10 +70,10 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
+        :page-sizes="[10, 20, 30, 50]"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="total">
       </el-pagination>
     </div>
   </div>
@@ -81,18 +81,18 @@
 
 <script>
 import { rules } from '@/utils/validate'
+import { findNote, addNote, deleteNote, updateNote } from '../../../api/admin/user'
 export default {
   data () {
     return {
-      currentPage: 5,
+      title: '新增',
+      total: 0,
+      currentPage: 1,
+      pageSize: 10,
       fromObj: {
         title: ''
       },
-      tableData: [{
-        title: '啦啦啦',
-        content: '今天又是活力满满的一天呀',
-        time: '2015-05-13 16:12:00'
-      }],
+      tableData: [],
       dialogFormVisible: false,
       formLabelWidth: '120px',
       rules: {
@@ -104,31 +104,121 @@ export default {
         ]
       },
       form: {
+        id: null,
         title: '',
         content: ''
+      },
+      findQuery: {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        page: 1,
+        limit: 10
       }
     }
   },
   methods: {
     closeDialog () {
-      this.$refs.form.resetFields()
       this.$refs.form.clearValidate()
+      this.form = {
+        id: null,
+        title: '',
+        content: ''
+      }
+    },
+    getDatas () {
+      findNote(this.findQuery).then(res => {
+        this.tableData = res.data
+        this.total = res.count
+      })
+    },
+    submit (formName) {
+      let _this = this
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          let query = {
+            title: _this.form.title,
+            content: _this.form.content
+          }
+          if (_this.form.id) {
+            query.id = _this.form.id
+            updateNote(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          } else {
+            query.u_id = JSON.parse(sessionStorage.getItem('userInfo')).id
+            addNote(query).then(res => {
+              console.log(res)
+              if (res.code === 0) {
+                _this.$message({
+                  type: 'success',
+                  message: res.data
+                })
+              }
+              _this.getDatas()
+            })
+          }
+          _this.dialogFormVisible = false
+        } else {
+          return false
+        }
+      })
     },
     add () {
+      this.form.id = null
+      this.title = '新增'
       this.dialogFormVisible = true
     },
     edit (row) {
-      console.log(row)
+      this.form.id = row.id
+      this.title = '修改'
+      this.form.title = row.title
+      this.form.content = row.content
+      this.dialogFormVisible = true
     },
     del (row) {
-      console.log(row)
+      let _this = this
+      this.$confirm('是否继续删除用户?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteNote({ id: row.id }).then(res => {
+          if (res.code === 0) {
+            _this.$message({
+              type: 'success',
+              message: res.data
+            })
+            _this.getDatas()
+          }
+        })
+      }).catch(() => {
+        _this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.findQuery.limit = val
+      this.getDatas()
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
+      this.currentPage = val
+      this.findQuery.page = val
+      this.getDatas()
     }
+  },
+  mounted () {
+    this.getDatas()
   }
 }
 </script>

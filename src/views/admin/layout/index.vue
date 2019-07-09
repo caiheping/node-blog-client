@@ -2,7 +2,7 @@
   <div class="layout">
     <el-container>
       <el-header :style="`background:${$store.state.theme}`">
-        <v-header :title="title"></v-header>
+        <v-header></v-header>
       </el-header>
       <el-container>
         <el-aside width="200px">
