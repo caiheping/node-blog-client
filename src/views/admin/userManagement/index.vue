@@ -20,7 +20,7 @@
           <el-input v-model="fromObj.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -48,7 +48,6 @@
           align="center"
           width="120">
           <template slot-scope="scope">
-<!--            <el-button @click="edit(scope.row)" type="text" class="edit">编辑</el-button>-->
             <el-button @click="del(scope.row)" type="text" class="del">删除</el-button>
           </template>
         </el-table-column>
@@ -81,9 +80,7 @@ export default {
       fromObj: {
         username: ''
       },
-      tableData: [{
-        username: '啦啦啦'
-      }],
+      tableData: [],
       rules: {
         username: [
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入用户名' }
@@ -100,12 +97,17 @@ export default {
         password: ''
       },
       findQuery: {
+        username: null,
         page: 1,
         limit: 10
       }
     }
   },
   methods: {
+    find () {
+      this.findQuery.username = this.fromObj.username
+      this.getDatas()
+    },
     getDatas () {
       findUser(this.findQuery).then(res => {
         console.log(res)

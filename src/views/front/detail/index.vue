@@ -53,8 +53,8 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(val, oldVal){
-        console.log(val);
+      handler: function (val, oldVal) {
+        console.log(val)
       },
       // 深度观察监听
       deep: true

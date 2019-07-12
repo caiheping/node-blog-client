@@ -14,10 +14,10 @@
     <div class="top">
       <el-form :inline="true" :model="fromObj">
         <el-form-item label="类型">
-          <el-input v-model="fromObj.typeName" placeholder="请输入类型"></el-input>
+          <el-input v-model="fromObj.type" placeholder="请输入类型"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -76,7 +76,7 @@ export default {
       currentPage: 1,
       pageSize: 10,
       fromObj: {
-        typeName: ''
+        type: ''
       },
       rules: {
         type: [
@@ -92,6 +92,7 @@ export default {
       },
       findQuery: {
         u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        title: null,
         page: 1,
         limit: 10
       }
@@ -104,6 +105,10 @@ export default {
         id: null,
         type: ''
       }
+    },
+    find () {
+      this.findQuery.title = this.fromObj.type
+      this.getDatas()
     },
     getDatas () {
       findArticleType(this.findQuery).then(res => {

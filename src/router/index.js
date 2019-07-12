@@ -15,19 +15,11 @@ export default new Router({
       }
     },
     {
-      path: '/',
-      redirect: '/layout'
-    },
-    {
       path: '/layout',
       component: () => import('../views/front/layout/index.vue'),
       children: [
         {
-          path: '',
-          redirect: 'home'
-        },
-        {
-          path: 'home',
+          path: 'home/:u_id',
           name: 'home',
           component: () => import('../views/front/home/index.vue'),
           meta: {
@@ -36,7 +28,7 @@ export default new Router({
           }
         },
         {
-          path: 'lifeNotes',
+          path: 'lifeNotes/:u_id',
           name: 'lifeNotes',
           component: () => import('../views/front/lifeNotes/index.vue'),
           meta: {
@@ -45,7 +37,7 @@ export default new Router({
           }
         },
         {
-          path: 'technique/:id',
+          path: 'technique/:u_id/:type',
           name: 'technique',
           component: () => import('../views/front/technique/index.vue'),
           meta: {
@@ -54,7 +46,7 @@ export default new Router({
           }
         },
         {
-          path: 'my',
+          path: 'my/:u_id',
           name: 'my',
           component: () => import('../views/front/my/index.vue'),
           meta: {
@@ -63,20 +55,11 @@ export default new Router({
           }
         },
         {
-          path: 'detail',
+          path: 'detail/:u_id',
           name: 'detail',
           component: () => import('../views/front/detail/index.vue'),
           meta: {
             title: '详情',
-            keepAlive: true
-          }
-        },
-        {
-          path: 'test',
-          name: 'test',
-          component: () => import('../views/front/test/index.vue'),
-          meta: {
-            title: 'test',
             keepAlive: true
           }
         }

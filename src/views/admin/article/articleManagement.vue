@@ -35,10 +35,13 @@
           <el-input v-model="fromObj.title" placeholder="请输入标题"></el-input>
         </el-form-item>
         <el-form-item label="类型">
-          <el-input v-model="fromObj.typeName" placeholder="请输入类型"></el-input>
+          <el-select v-model="fromObj.type" placeholder="请选择类型">
+            <el-option label="全部" value=""></el-option>
+            <el-option :label="item.title" :value="item.title" v-for="item in typeArr" :key="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -126,8 +129,7 @@
 <script>
 import TinymceEditor from '../../../components/tinymce-editor/index'
 import { rules } from '@/utils/validate'
-import { findArticle, addArticle, deleteArticle, updateArticle } from '../../../api/admin/article'
-import { findArticleAllType } from '../../../api/admin/article'
+import { findArticle, addArticle, deleteArticle, updateArticle, findArticleType } from '../../../api/admin/article'
 export default {
   components: { TinymceEditor },
   data () {
@@ -139,7 +141,7 @@ export default {
       pageSize: 10,
       fromObj: {
         title: '',
-        typeName: ''
+        type: ''
       },
       typeArr: [],
       tableData: [],
@@ -159,12 +161,14 @@ export default {
       form: {
         id: null,
         title: '',
-        cover_photo: require('../../../static/img/avater.jpg'),
+        cover_photo: '',
         content: '本地图片上传功能仅为演示，实际使用需要补全图片存储地址',
         type: ''
       },
       findQuery: {
         u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        type: null,
+        title: null,
         page: 1,
         limit: 10
       }
@@ -187,6 +191,11 @@ export default {
         message: '上传失败'
       })
       console.log(err)
+    },
+    find () {
+      this.findQuery.type = this.fromObj.type
+      this.findQuery.title = this.fromObj.title
+      this.getDatas()
     },
     submit (formName) {
       let _this = this
@@ -241,7 +250,7 @@ export default {
       }
     },
     getTypes () {
-      findArticleAllType().then(res => {
+      findArticleType({ u_id: JSON.parse(sessionStorage.getItem('userInfo')).id }).then(res => {
         console.log(res)
         if (res.code === 0) {
           this.typeArr = res.data

@@ -2,36 +2,36 @@
   <div class="technique">
     <div class="left">
       <ul class="article">
-        <li v-for="item in 4" :key="item">
-          <div class="item" @click.prevent="toDetail">
+        <li v-for="item in articleLists" :key="item.id">
+          <div class="item" @click.prevent="toDetail(item.id)">
             <header>
               <h2>
-                <span>python</span>
-                Python 深度学习脚手架 ModelZoo
+                <span>{{item.type}}</span>
+                {{item.title}}
               </h2>
             </header>
             <div class="focus">
               <a href="">
-                <img src="../../../static/img/avater.jpg" alt="">
+                <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <span class="note">想必大家都或多或少听过 TensorFlow 的大名，这是 Google 开源的一个深度学习框架，里面的模型和 API 可以说基本是一应俱全，但 TensorFlow 其实有很多让人吐槽的地方，比如 TensorFlow 早期是只支持静态图的，你要调试和查看变量的值的话就得一个个...</span>
+            <span class="note">{{item.content}}</span>
             <p class="auth-span">
+<!--              <span class="muted">-->
+<!--                <i class="el-icon-s-custom"></i>-->
+<!--                小菜-->
+<!--              </span>-->
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                小菜
+                {{item.createdAt}}
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                2016-10-29
+                {{item.browse}}浏览
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                7213浏览
-              </span>
-              <span class="muted">
-                <i class="el-icon-s-custom"></i>
-                23喜欢
+                {{item.love}}喜欢
               </span>
             </p>
           </div>
@@ -45,7 +45,7 @@
       <div class="love">
         <h4>猜你喜欢</h4>
         <ul>
-          <li v-for="item in 5" :key="item" @click.prevent="toDetail">
+          <li v-for="item in 5" :key="item" @click.prevent="toDetail(item)">
             <a href="">
               <img src="../../../static/img/avater.jpg" alt="">
             </a>
@@ -72,21 +72,38 @@
 </template>
 
 <script>
+import { findArticle } from '../../../api/front/article'
+import moment from 'moment'
 export default {
   data () {
     return {
-
+      articleLists: []
     }
   },
   methods: {
-    toDetail () {
+    getArticles () {
+      findArticle({ u_id: this.$route.params.u_id, type: this.$route.params.type }).then(res => {
+        if (res.code === 0) {
+          res.data.forEach(item => {
+            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
+            item.browse = item.Ips.length
+            item.love = item.Ips.filter(list => list.is_love !== 0).length
+          })
+          this.articleLists = res.data
+        }
+      })
+    },
+    toDetail (id) {
       this.$router.push({
-        path: '/layout/detail',
+        path: `/layout/detail/${this.$route.params.u_id}`,
         query: {
-          id: 1
+          id
         }
       })
     }
+  },
+  mounted () {
+    this.getArticles()
   }
 }
 </script>

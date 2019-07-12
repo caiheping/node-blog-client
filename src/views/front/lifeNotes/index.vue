@@ -1,29 +1,44 @@
 <template>
-  <div class="lifeNotes">
+  <div class="lifeNotes" v-if="notes">
     <div class="block">
       <el-timeline>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
+        <el-timeline-item :timestamp="item.createdAt" placement="top" v-for="item in notes" :key="item.id">
           <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/3" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>尝试了大佬的gerapy神器，发现一个问题暂时解决不了，就是会报类似这样的错误:File "/tmp/content_spider-1561715038-7AAhwY.egg/content_spider/pipelines.py", line 38, in __init__ IOError: [Errno 2] No such file or directory 但是有的机器上又是可以的(环境是一样的) 这是什么原因呢 望大佬指点6</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/2" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/2 20:46</p>
+            <h4>{{item.title}}</h4>
+            <p>{{item.content}}</p>
           </el-card>
         </el-timeline-item>
       </el-timeline>
     </div>
   </div>
 </template>
+
+<script>
+import { findNote } from '../../../api/front/user'
+import moment from 'moment'
+export default {
+  data () {
+    return {
+      notes: null
+    }
+  },
+  methods: {
+    getDatas () {
+      findNote({ u_id: this.$route.params.u_id }).then(res => {
+        if (res.code === 0) {
+          res.data.forEach(item => {
+            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD hh:mm:ss')
+          })
+          this.notes = res.data
+        }
+      })
+    }
+  },
+  mounted () {
+    this.getDatas()
+  }
+}
+</script>
 
 <style scoped lang="less">
   .lifeNotes{

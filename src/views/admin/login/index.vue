@@ -92,6 +92,15 @@ export default {
     resetForm (formName) {
       this.$refs[formName].resetFields()
     }
+  },
+  mounted () {
+    let _this = this
+    document.onkeydown = function (e) {
+      let key = window.event.keyCode
+      if (key === 13) {
+        _this.submitForm('loginForm')
+      }
+    }
   }
 }
 </script>

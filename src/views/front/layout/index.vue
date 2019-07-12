@@ -33,26 +33,25 @@
             :default-active="$route.path"
             :router="true"
             mode="horizontal"
-            @select="handleSelect"
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#d56464">
-            <el-menu-item index="/layout/home">首页</el-menu-item>
+            <el-menu-item :index="`/layout/home/${$route.params.u_id}`">首页</el-menu-item>
             <el-submenu index="2">
               <template slot="title">技术杂谈</template>
-              <el-menu-item index="/layout/technique/1">html/js/css</el-menu-item>
-              <el-menu-item index="/layout/technique/2">java</el-menu-item>
-              <el-menu-item index="/layout/technique/3">python</el-menu-item>
-              <el-menu-item index="/layout/technique/4">资源</el-menu-item>
+              <el-menu-item :index="`/layout/technique/${$route.params.u_id}/${item.title}`" v-for="item in typeLists" :key="item.id">{{item.title}}</el-menu-item>
             </el-submenu>
-            <el-menu-item index="/layout/lifeNotes">记录笔记</el-menu-item>
-            <el-menu-item index="/layout/my">关于自己</el-menu-item>
+            <el-menu-item :index="`/layout/lifeNotes/${$route.params.u_id}`">记录笔记</el-menu-item>
+            <el-menu-item :index="`/layout/my/${$route.params.u_id}`">关于自己</el-menu-item>
           </el-menu>
         </div>
       </div>
     </div>
     <div class="container">
-      <router-view />
+      <keep-alive v-if="$route.meta.keepAlive">
+        <router-view></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <div class="bottom">
       <p>慢节奏 版权所有者：caiheping（小菜）</p>
@@ -61,15 +60,22 @@
 </template>
 
 <script>
+import { findArticleType } from '../../../api/front/article'
 export default {
   data () {
     return {
+      typeLists: []
     }
   },
   methods: {
-    handleSelect (key, keyPath) {
-      // console.log(key, keyPath)
+    getTypes () {
+      findArticleType({ u_id: this.$route.params.u_id }).then(res => {
+        this.typeLists = res.data
+      })
     }
+  },
+  mounted () {
+    this.getTypes()
   }
 }
 </script>

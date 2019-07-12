@@ -27,7 +27,7 @@
           <el-input v-model="fromObj.index" placeholder="请输入图片索引"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -95,6 +95,10 @@ export default {
         id: null,
         index: '',
         url: ''
+      },
+      findQuery: {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        index: null
       }
     }
   },
@@ -163,11 +167,12 @@ export default {
         }
       })
     },
+    find () {
+      this.findQuery.index = this.fromObj.index
+      this.getDatas()
+    },
     getDatas () {
-      let query = {
-        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id
-      }
-      findBanner(query).then(res => {
+      findBanner(this.findQuery).then(res => {
         console.log(res)
         if (res.code === 0) {
           this.tableData = res.data

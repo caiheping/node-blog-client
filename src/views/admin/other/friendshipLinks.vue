@@ -20,7 +20,7 @@
           <el-input v-model="fromObj.title" placeholder="请输入标题"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -87,6 +87,10 @@ export default {
         id: null,
         title: '',
         url: ''
+      },
+      findQuery: {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        title: null
       }
     }
   },
@@ -138,11 +142,12 @@ export default {
         }
       })
     },
+    find () {
+      this.findQuery.title = this.fromObj.title
+      this.getDatas()
+    },
     getDatas () {
-      let query = {
-        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id
-      }
-      findFriendshipLink(query).then(res => {
+      findFriendshipLink(this.findQuery).then(res => {
         if (res.code === 0) {
           this.tableData = res.data
         }

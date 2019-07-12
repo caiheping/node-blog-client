@@ -20,7 +20,7 @@
           <el-input v-model="fromObj.title" placeholder="请输入标题"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="find">查询</el-button>
         </el-form-item>
       </el-form>
       <div class="right">
@@ -110,6 +110,7 @@ export default {
       },
       findQuery: {
         u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
+        title: null,
         page: 1,
         limit: 10
       }
@@ -123,6 +124,10 @@ export default {
         title: '',
         content: ''
       }
+    },
+    find () {
+      this.findQuery.title = this.fromObj.title
+      this.getDatas()
     },
     getDatas () {
       findNote(this.findQuery).then(res => {

@@ -1,22 +1,22 @@
 <template>
-  <div class="my">
+  <div class="my" v-if="userInfo">
     <div class="box">
       <h3>关于自己</h3>
       <div class="introduction">
         <h4>个人简介</h4>
         <div class="content">
           <img src="../../../static/img/avater.jpg" alt="">
-          <p>小菜</p>
-          <p>爱生活、爱艺术、爱书画、爱音乐、爱设计、爱编程。</p>
-          <p>人生百态，笑口常开，秉承自我，谨慎独行。静觅，静静寻觅生活的美好。</p>
+          <p>{{userInfo.nickname}}</p>
+          <p>{{userInfo.motto}}</p>
+          <p>{{userInfo.hobby}}</p>
         </div>
       </div>
       <div class="skill">
         <h4>我的技能树</h4>
         <ul class="content">
-          <li v-for="item in 4" :key="item">
-            <span>HTML/CSS/JS</span>
-            <el-progress :text-inside="true" :stroke-width="26" :percentage="70"></el-progress>
+          <li v-for="item in userInfo.Skills" :key="item.id">
+            <span>{{item.skill}}</span>
+            <el-progress :text-inside="true" :stroke-width="26" :percentage="item.proficiency"></el-progress>
           </li>
         </ul>
       </div>
@@ -24,32 +24,32 @@
         <h4>与我联系</h4>
         <ul class="content">
           <li>
-            <el-tooltip class="item" effect="dark" content="github地址：https://github.com/caiheping" placement="top-start">
+            <el-tooltip class="item" effect="dark" :content="`github地址：${userInfo.github?userInfo.github:'暂无'}`" placement="top-start">
               <svg-icon icon-class="github" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item qq" effect="dark" content="qq: 1670341607" placement="top-start">
+            <el-tooltip class="item qq" effect="dark"  :content="`qq：${userInfo.qq?userInfo.qq:'暂无'}`" placement="top-start">
               <svg-icon icon-class="qq" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark" content="邮箱地址：1670341607@qq.com" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`邮箱：${userInfo.email?userInfo.email:'暂无'}`" placement="top-start">
               <svg-icon icon-class="youxiang" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark" content="暂无" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`微信：${userInfo.wechat?userInfo.wechat:'暂无'}`" placement="top-start">
               <svg-icon icon-class="weixin" class-name="icon"/>
             </el-tooltip>
           </li>
           <li class="weibo">
-            <el-tooltip class="item" effect="dark" content="暂无" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`微博：${userInfo.weibo?userInfo.weibo:'暂无'}`" placement="top-start">
               <svg-icon icon-class="weibo" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark" content="暂无" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`RSS：${userInfo.RSS?userInfo.RSS:'暂无'}`" placement="top-start">
               <svg-icon icon-class="RSS" class-name="icon"/>
             </el-tooltip>
           </li>
@@ -58,6 +58,29 @@
     </div>
   </div>
 </template>
+
+<script>
+import { findUserInfo } from '../../../api/front/user'
+export default {
+  data () {
+    return {
+      userInfo: null
+    }
+  },
+  methods: {
+    getDatas () {
+      findUserInfo({ u_id: this.$route.params.u_id }).then(res => {
+        if (res.code === 0) {
+          this.userInfo = res.data
+        }
+      })
+    }
+  },
+  mounted () {
+    this.getDatas()
+  }
+}
+</script>
 
 <style scoped lang="less">
   .my{
