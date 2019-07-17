@@ -2,47 +2,47 @@
   <div class="home">
     <div class="left">
       <el-carousel :interval="5000" arrow="always">
-        <el-carousel-item v-for="item in 4" :key="item">
-          <h3>{{ item }}</h3>
+        <el-carousel-item v-for="item in datas.banners" :key="item.id">
+          <img :src="item.url" alt="">
         </el-carousel-item>
       </el-carousel>
       <div class="hot">
         <h4>热门排行</h4>
         <ul>
-          <li v-for="item in 5" :key="item">
-            <p>{{item}}、Python2爬虫学习系列教程</p>
-            <span class="love">5646喜欢</span>
+          <li v-for="(item, index) in datas.hots" :key="item.id">
+            <p>{{index + 1}}、{{item.title}}</p>
+            <span class="love">{{item.love}}喜欢</span>
           </li>
         </ul>
       </div>
       <ul class="article">
-        <li v-for="item in 9" :key="item" @click.prevent="toDetail">
+        <li v-for="item in datas.articles" :key="item.id" @click.prevent="toDetail">
           <div class="item">
             <header>
-              <h2>sdfdssd</h2>
+              <h2>{{item.title}}</h2>
             </header>
             <div class="focus">
               <a href="">
-                <img src="../../../static/img/avater.jpg" alt="">
+                <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <span class="note">问题来 问题来源 在写代码的时候遇到了如下问题： 使用了bootstrap框架来编写了一个页面，其中input元素两侧留有空白。然而用JS动态添加的同样的元素却不会出现这种情况。具体截图表现如下： 我们可以发现，第一行和而三行的代码是完全一样的，可是呈现的结果是截然不同的。 在线测试样... 问题来源 在写代码的时候遇到了如下问题： 使用了bootstrap框架来编写了一个页面，其中input元素两侧留有空白。然而用JS动态添加的同样的元素却不会出现这种情况。具体截图表现如下： 我们可以发现，第一行和而三行的代码是完全一样的，可是呈现的结果是截然不同的。 在线测试样...源 在写代码的时候遇到了如下问题： 使用了bootstrap框架来编写了一个页面，其中input元素两侧留有空白。然而用JS动态添加的同样的元素却不会出现这种情况。具体截图表现如下： 我们可以发现，第一行和而三行的代码是完全一样的，可是呈现的结果是截然不同的。 在线测试样</span>
+            <span class="note" v-html="item.content"></span>
             <p class="auth-span">
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                小菜
+                {{nickname}}
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                2016-10-29
+                {{item.createdAt}}
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                7213浏览
+                {{item.browse}}浏览
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                23喜欢
+                {{item.love}}喜欢
               </span>
             </p>
           </div>
@@ -56,15 +56,15 @@
       <div class="love">
         <h4>猜你喜欢</h4>
         <ul>
-          <li v-for="item in 5" :key="item" @click.prevent="toDetail">
+          <li v-for="item in datas.loves" :key="item.id" @click.prevent="toDetail">
             <a href="">
-              <img src="../../../static/img/avater.jpg" alt="">
+              <img :src="item.cover_photo" alt="">
             </a>
             <div class="content">
-              <p>[Python3网络爬虫开发实战] 1.8.4-Scrapy-Redis的安装</p>
+              <p>{{item.title}}</p>
               <div>
-                <span>2018-01-11</span>
-                <span>54浏览</span>
+                <span>{{item.createdAt}}</span>
+                <span>{{item.browse}}浏览</span>
               </div>
             </div>
           </li>
@@ -73,8 +73,8 @@
       <div class="fav">
         <h4>友情链接</h4>
         <ul>
-          <li v-for="item in 9" :key="item">
-            <a>ddfd</a>
+          <li v-for="item in datas.links" :key="item.id">
+            <a :href="item.url">{{item.title}}</a>
           </li>
         </ul>
       </div>
@@ -83,8 +83,29 @@
 </template>
 
 <script>
+import { home } from '../../../api/front/home'
+import moment from 'moment'
 export default {
+  data () {
+    return {
+      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : '',
+      datas: {}
+    }
+  },
   methods: {
+    getDatas () {
+      home({ u_id: this.$route.params.u_id }).then(res => {
+        if (res.code === 0) {
+          res.data.articles.forEach(item => {
+            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
+          })
+          res.data.loves.forEach(item => {
+            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
+          })
+          this.datas = res.data
+        }
+      })
+    },
     toDetail () {
       this.$router.push({
         path: '/layout/detail',
@@ -93,6 +114,11 @@ export default {
         }
       })
     }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.getDatas()
+    })
   }
 }
 </script>

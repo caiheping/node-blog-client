@@ -15,12 +15,12 @@
                 <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <span class="note">{{item.content}}</span>
+            <span class="note" v-html="item.content"></span>
             <p class="auth-span">
-<!--              <span class="muted">-->
-<!--                <i class="el-icon-s-custom"></i>-->
-<!--                小菜-->
-<!--              </span>-->
+              <span class="muted">
+                <i class="el-icon-s-custom"></i>
+                {{nickname}}
+              </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
                 {{item.createdAt}}
@@ -77,6 +77,7 @@ import moment from 'moment'
 export default {
   data () {
     return {
+      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : '',
       articleLists: []
     }
   },

@@ -5,7 +5,7 @@
       <div class="introduction">
         <h4>个人简介</h4>
         <div class="content">
-          <img src="../../../static/img/avater.jpg" alt="">
+          <img :src="userInfo.avatar" alt="">
           <p>{{userInfo.nickname}}</p>
           <p>{{userInfo.motto}}</p>
           <p>{{userInfo.hobby}}</p>
@@ -60,24 +60,11 @@
 </template>
 
 <script>
-import { findUserInfo } from '../../../api/front/user'
 export default {
   data () {
     return {
-      userInfo: null
+      userInfo: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')) : null
     }
-  },
-  methods: {
-    getDatas () {
-      findUserInfo({ u_id: this.$route.params.u_id }).then(res => {
-        if (res.code === 0) {
-          this.userInfo = res.data
-        }
-      })
-    }
-  },
-  mounted () {
-    this.getDatas()
   }
 }
 </script>

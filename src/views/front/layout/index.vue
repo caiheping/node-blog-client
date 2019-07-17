@@ -61,6 +61,7 @@
 
 <script>
 import { findArticleType } from '../../../api/front/article'
+import { findUserInfo } from '../../../api/front/user'
 export default {
   data () {
     return {
@@ -72,10 +73,18 @@ export default {
       findArticleType({ u_id: this.$route.params.u_id }).then(res => {
         this.typeLists = res.data
       })
+    },
+    getUserInfo () {
+      findUserInfo({ u_id: this.$route.params.u_id }).then(res => {
+        if (res.code === 0) {
+          sessionStorage.setItem('userInfo', JSON.stringify(res.data))
+        }
+      })
     }
   },
   mounted () {
     this.getTypes()
+    this.getUserInfo()
   }
 }
 </script>
