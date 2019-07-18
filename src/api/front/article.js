@@ -9,3 +9,8 @@ export function findArticleType (query = {}) {
 export function findArticle (query = {}) {
   return httpRequest('/fornt/article/findArticle', 'get', query)
 }
+
+// 通过id查询文章
+export function findArticleById (query = {}) {
+  return httpRequest('/fornt/article/findArticleById', 'get', query)
+}

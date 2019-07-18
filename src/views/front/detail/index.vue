@@ -3,39 +3,40 @@
     <div class="top">
       <div class="breadcrumb">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/technique/1' }">技术杂谈</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: `/layout/technique/${$route.params.u_id}/${$route.params.type}` }">技术杂谈</el-breadcrumb-item>
           <el-breadcrumb-item>干货！IT小伙伴们实用的网站及工具大集合！持续更新！</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="header">
-        <p>干货！IT小伙伴们实用的网站及工具大集合！持续更新！</p>
+        <p>{{articleData.title}}</p>
         <ul>
           <li>
             <svg-icon icon-class="article" class-name="icon"/>
-            <span>python</span>
+            <span>{{articleData.type}}</span>
           </li>
           <li>
             <svg-icon icon-class="user" class-name="icon"/>
-            <span>小菜</span>
+            <span>{{$store.state.userInfo.nickname}}</span>
           </li>
           <li>
             <svg-icon icon-class="time" class-name="icon"/>
-            <span>2015-10-11 16:00:00</span>
+            <span>{{articleData.createdAt}}</span>
           </li>
           <li>
             <svg-icon icon-class="look" class-name="icon"/>
-            <span>545浏览</span>
+            <span>{{articleData.browse}}浏览</span>
           </li>
           <li>
             <svg-icon icon-class="love" class-name="icon"/>
-            <span>123喜欢</span>
+            <span>{{articleData.love}}喜欢</span>
           </li>
         </ul>
       </div>
     </div>
     <div class="content">
-      <div v-html="content"></div>
-      <p class="other">转载请注明：小菜 » 滑动验证码的原理并利用 Vue 实现滑动验证码</p>
+      <div>{{articleData.preface}}</div>
+      <div v-html="articleData.content"></div>
+      <p class="other">转载请注明：{{$store.state.userInfo.nickname}} » {{articleData.title}}</p>
       <div class="bottom">
         <el-button type="primary">喜欢</el-button>
         <el-button type="primary">分享</el-button>
@@ -45,20 +46,27 @@
 </template>
 
 <script>
+import { findArticleById } from '../../../api/front/article'
+import moment from 'moment'
 export default {
   data () {
     return {
-      content: '<h2>hahah</h2>'
+      articleData: {}
     }
   },
-  watch: {
-    $route: {
-      handler: function (val, oldVal) {
-        console.log(val)
-      },
-      // 深度观察监听
-      deep: true
+  methods: {
+    getDetail () {
+      findArticleById({ id: this.$route.query.id, u_id: this.$route.params.u_id }).then(res => {
+        console.log(res)
+        if (res.code === 0) {
+          this.articleData = res.data
+          this.articleData.createdAt = moment(res.data.createdAt).format('YYYY-MM-DD')
+        }
+      })
     }
+  },
+  mounted () {
+    this.getDetail()
   }
 }
 </script>

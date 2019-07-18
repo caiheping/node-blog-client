@@ -27,7 +27,7 @@ export default {
       findNote({ u_id: this.$route.params.u_id }).then(res => {
         if (res.code === 0) {
           res.data.forEach(item => {
-            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD hh:mm:ss')
+            item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
           })
           this.notes = res.data
         }

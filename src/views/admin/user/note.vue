@@ -49,7 +49,7 @@
           label="内容">
         </el-table-column>
         <el-table-column
-          prop="time"
+          prop="createdAt"
           align="center"
           label="时间"
           width="200">
@@ -82,6 +82,7 @@
 <script>
 import { rules } from '@/utils/validate'
 import { findNote, addNote, deleteNote, updateNote } from '../../../api/admin/user'
+import moment from 'moment'
 export default {
   data () {
     return {
@@ -131,6 +132,9 @@ export default {
     },
     getDatas () {
       findNote(this.findQuery).then(res => {
+        res.data.forEach(item => {
+          item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        })
         this.tableData = res.data
         this.total = res.count
       })

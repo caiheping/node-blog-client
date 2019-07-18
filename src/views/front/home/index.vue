@@ -26,7 +26,7 @@
                 <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <span class="note" v-html="item.content"></span>
+            <div class="note" v-html="item.content"></div>
             <p class="auth-span">
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
@@ -56,7 +56,7 @@
       <div class="love">
         <h4>猜你喜欢</h4>
         <ul>
-          <li v-for="item in datas.loves" :key="item.id" @click.prevent="toDetail">
+          <li v-for="item in $store.state.baseDatas.loves" :key="item.id" @click.prevent="toDetail">
             <a href="">
               <img :src="item.cover_photo" alt="">
             </a>
@@ -73,7 +73,7 @@
       <div class="fav">
         <h4>友情链接</h4>
         <ul>
-          <li v-for="item in datas.links" :key="item.id">
+          <li v-for="item in $store.state.baseDatas.links" :key="item.id">
             <a :href="item.url">{{item.title}}</a>
           </li>
         </ul>
@@ -102,13 +102,18 @@ export default {
           res.data.loves.forEach(item => {
             item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
           })
+          let rightObj = {
+            loves: res.data.loves,
+            links: res.data.links
+          }
+          this.$store.state.baseDatas = rightObj
           this.datas = res.data
         }
       })
     },
     toDetail () {
       this.$router.push({
-        path: '/layout/detail',
+        path: `/layout/detail/${this.$route.params.u_id}`,
         query: {
           id: 1
         }

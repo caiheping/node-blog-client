@@ -5,6 +5,9 @@
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input v-model="form.title" autocomplete="off" placeholder="请输入标题"></el-input>
         </el-form-item>
+        <el-form-item label="前言" :label-width="formLabelWidth" prop="preface">
+          <el-input v-model="form.preface" type="textarea" autocomplete="off" placeholder="请输入前言"></el-input>
+        </el-form-item>
         <el-form-item label="封面图片" :label-width="formLabelWidth" prop="title">
           <el-upload
             :action="uploadUrl"
@@ -65,9 +68,9 @@
           label="标题">
         </el-table-column>
         <el-table-column
-          prop="content"
+          prop="preface"
           align="center"
-          label="内容">
+          label="前言">
         </el-table-column>
         <el-table-column
           prop="cover_photo"
@@ -130,6 +133,7 @@
 import TinymceEditor from '../../../components/tinymce-editor/index'
 import { rules } from '@/utils/validate'
 import { findArticle, addArticle, deleteArticle, updateArticle, findArticleType } from '../../../api/admin/article'
+import moment from 'moment'
 export default {
   components: { TinymceEditor },
   data () {
@@ -151,6 +155,9 @@ export default {
         title: [
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入标题' }
         ],
+        preface: [
+          { required: true, validator: rules.string, trigger: 'blur', message: '请输入前言' }
+        ],
         content: [
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入内容' }
         ],
@@ -161,6 +168,7 @@ export default {
       form: {
         id: null,
         title: '',
+        preface: '',
         cover_photo: '',
         content: '本地图片上传功能仅为演示，实际使用需要补全图片存储地址',
         type: ''
@@ -204,6 +212,7 @@ export default {
           console.log(_this.$refs.tinymce.content)
           let query = {
             title: _this.form.title,
+            preface: _this.form.preface,
             content: _this.$refs.tinymce.content,
             type: _this.form.type,
             cover_photo: _this.form.cover_photo
@@ -240,28 +249,28 @@ export default {
       })
     },
     closeDialog () {
-      this.$refs.form.clearValidate()
       this.form = {
         id: null,
         title: '',
         cover_photo: require('../../../static/img/avater.jpg'),
         content: '本地图片上传功能仅为演示，实际使用需要补全图片存储地址',
-        type: ''
+        type: this.typeArr[0].title
       }
+      this.$refs.form.clearValidate()
     },
     getTypes () {
       findArticleType({ u_id: JSON.parse(sessionStorage.getItem('userInfo')).id }).then(res => {
-        console.log(res)
         if (res.code === 0) {
           this.typeArr = res.data
         }
+        this.form.type = this.typeArr[0].title
+        console.log(this.form)
       })
     },
     getDatas () {
       findArticle(this.findQuery).then(res => {
         res.data.forEach(item => {
-          item.browse = item.Ips.length
-          item.love = item.Ips.filter(list => list.is_love !== 0).length
+          item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
         })
         this.tableData = res.data
         this.total = res.count
@@ -278,6 +287,7 @@ export default {
       this.title = '修改'
       this.form.type = row.type
       this.form.title = row.title
+      this.form.preface = row.preface
       this.form.cover_photo = row.cover_photo
       this.form.content = row.content
       this.dialogFormVisible = true

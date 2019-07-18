@@ -1,20 +1,20 @@
 <template>
-  <div class="my" v-if="userInfo">
+  <div class="my" v-if="$store.state.userInfo">
     <div class="box">
       <h3>关于自己</h3>
       <div class="introduction">
         <h4>个人简介</h4>
         <div class="content">
-          <img :src="userInfo.avatar" alt="">
-          <p>{{userInfo.nickname}}</p>
-          <p>{{userInfo.motto}}</p>
-          <p>{{userInfo.hobby}}</p>
+          <img :src="$store.state.userInfo.avatar" alt="">
+          <p>{{$store.state.userInfo.nickname}}</p>
+          <p>{{$store.state.userInfo.motto}}</p>
+          <p>{{$store.state.userInfo.hobby}}</p>
         </div>
       </div>
       <div class="skill">
         <h4>我的技能树</h4>
         <ul class="content">
-          <li v-for="item in userInfo.Skills" :key="item.id">
+          <li v-for="item in $store.state.userInfo.Skills" :key="item.id">
             <span>{{item.skill}}</span>
             <el-progress :text-inside="true" :stroke-width="26" :percentage="item.proficiency"></el-progress>
           </li>
@@ -24,32 +24,32 @@
         <h4>与我联系</h4>
         <ul class="content">
           <li>
-            <el-tooltip class="item" effect="dark" :content="`github地址：${userInfo.github?userInfo.github:'暂无'}`" placement="top-start">
+            <el-tooltip class="item" effect="dark" :content="`github地址：${$store.state.userInfo.github?$store.state.userInfo.github:'暂无'}`" placement="top-start">
               <svg-icon icon-class="github" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item qq" effect="dark"  :content="`qq：${userInfo.qq?userInfo.qq:'暂无'}`" placement="top-start">
+            <el-tooltip class="item qq" effect="dark"  :content="`qq：${$store.state.userInfo.qq?$store.state.userInfo.qq:'暂无'}`" placement="top-start">
               <svg-icon icon-class="qq" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark"  :content="`邮箱：${userInfo.email?userInfo.email:'暂无'}`" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`邮箱：${$store.state.userInfo.email?$store.state.userInfo.email:'暂无'}`" placement="top-start">
               <svg-icon icon-class="youxiang" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark"  :content="`微信：${userInfo.wechat?userInfo.wechat:'暂无'}`" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`微信：${$store.state.userInfo.wechat?$store.state.userInfo.wechat:'暂无'}`" placement="top-start">
               <svg-icon icon-class="weixin" class-name="icon"/>
             </el-tooltip>
           </li>
           <li class="weibo">
-            <el-tooltip class="item" effect="dark"  :content="`微博：${userInfo.weibo?userInfo.weibo:'暂无'}`" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`微博：${$store.state.userInfo.weibo?$store.state.userInfo.weibo:'暂无'}`" placement="top-start">
               <svg-icon icon-class="weibo" class-name="icon"/>
             </el-tooltip>
           </li>
           <li>
-            <el-tooltip class="item" effect="dark"  :content="`RSS：${userInfo.RSS?userInfo.RSS:'暂无'}`" placement="top-start">
+            <el-tooltip class="item" effect="dark"  :content="`RSS：${$store.state.userInfo.RSS?$store.state.userInfo.RSS:'暂无'}`" placement="top-start">
               <svg-icon icon-class="RSS" class-name="icon"/>
             </el-tooltip>
           </li>
@@ -58,16 +58,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  data () {
-    return {
-      userInfo: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')) : null
-    }
-  }
-}
-</script>
 
 <style scoped lang="less">
   .my{

@@ -2,7 +2,7 @@
   <div class="technique">
     <div class="left">
       <ul class="article">
-        <li v-for="item in articleLists" :key="item.id">
+        <li v-for="item in $store.state.articleLists" :key="item.id">
           <div class="item" @click.prevent="toDetail(item.id)">
             <header>
               <h2>
@@ -45,15 +45,15 @@
       <div class="love">
         <h4>猜你喜欢</h4>
         <ul>
-          <li v-for="item in 5" :key="item" @click.prevent="toDetail(item)">
+          <li v-for="item in $store.state.baseDatas.loves" :key="item.id" @click.prevent="toDetail">
             <a href="">
-              <img src="../../../static/img/avater.jpg" alt="">
+              <img :src="item.cover_photo" alt="">
             </a>
             <div class="content">
-              <p>[Python3网络爬虫开发实战] 1.8.4-Scrapy-Redis的安装</p>
+              <p>{{item.title}}</p>
               <div>
-                <span>2018-01-11</span>
-                <span>54浏览</span>
+                <span>{{item.createdAt}}</span>
+                <span>{{item.browse}}浏览</span>
               </div>
             </div>
           </li>
@@ -62,8 +62,8 @@
       <div class="fav">
         <h4>友情链接</h4>
         <ul>
-          <li v-for="item in 9" :key="item">
-            <a>ddfd</a>
+          <li v-for="item in $store.state.baseDatas.links" :key="item.id">
+            <a :href="item.url">{{item.title}}</a>
           </li>
         </ul>
       </div>
@@ -73,28 +73,38 @@
 
 <script>
 import { findArticle } from '../../../api/front/article'
+import { home } from '../../../api/front/home'
 import moment from 'moment'
 export default {
   data () {
     return {
-      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : '',
-      articleLists: []
+      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : ''
     }
   },
   methods: {
-    getArticles () {
+    rightDatas () {
+      home({ u_id: this.$route.params.u_id }).then(res => {
+        if (res.code === 0) {
+          let rightObj = {
+            loves: res.data.loves,
+            links: res.data.links
+          }
+          this.$store.state.baseDatas = rightObj
+        }
+      })
+    },
+    init () {
       findArticle({ u_id: this.$route.params.u_id, type: this.$route.params.type }).then(res => {
         if (res.code === 0) {
           res.data.forEach(item => {
             item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
-            item.browse = item.Ips.length
-            item.love = item.Ips.filter(list => list.is_love !== 0).length
           })
-          this.articleLists = res.data
+          this.$store.state.articleLists = res.data
         }
       })
     },
     toDetail (id) {
+      console.log(this.$route.params.u_id)
       this.$router.push({
         path: `/layout/detail/${this.$route.params.u_id}`,
         query: {
@@ -104,7 +114,10 @@ export default {
     }
   },
   mounted () {
-    this.getArticles()
+    if (!this.$store.state.articleLists.length) {
+      this.init()
+    }
+    this.rightDatas()
   }
 }
 </script>
