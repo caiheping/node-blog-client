@@ -4,7 +4,7 @@
       <el-timeline>
         <el-timeline-item :timestamp="item.createdAt" placement="top" v-for="item in notes" :key="item.id">
           <el-card>
-            <h4>{{item.title}}</h4>
+            <h4>标题：{{item.title}}</h4>
             <p>{{item.content}}</p>
           </el-card>
         </el-timeline-item>

@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="layout" v-if="$store.state.userInfo">
     <div class="bg">
       <vue-particles
         color="#777777"
@@ -66,7 +66,6 @@ import moment from 'moment'
 export default {
   data () {
     return {
-      nickname: '',
       typeLists: []
     }
   },
@@ -95,7 +94,7 @@ export default {
       findUserInfo({ u_id: this.$route.params.u_id }).then(res => {
         if (res.code === 0) {
           sessionStorage.setItem('userInfo', JSON.stringify(res.data))
-          this.nickname = res.data.nickname
+          this.$store.state.userInfo = res.data
         }
       })
     }

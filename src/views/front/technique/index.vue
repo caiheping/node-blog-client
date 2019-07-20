@@ -1,7 +1,7 @@
 <template>
   <div class="technique">
     <div class="left">
-      <ul class="article">
+      <ul class="infinite-list article" infinite-scroll-disabled="disabled" v-infinite-scroll="load">
         <li v-for="item in $store.state.articleLists" :key="item.id">
           <div class="item" @click.prevent="toDetail(item.id)">
             <header>
@@ -19,7 +19,7 @@
             <p class="auth-span">
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                {{nickname}}
+                {{$store.state.userInfo.nickname}}
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
@@ -37,6 +37,8 @@
           </div>
         </li>
       </ul>
+      <p v-if="loading">加载中...</p>
+      <p v-if="noMore">没有更多了</p>
     </div>
     <div class="right">
       <div class="other">
@@ -78,10 +80,22 @@ import moment from 'moment'
 export default {
   data () {
     return {
-      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : ''
+      page: 1,
+      limit: 1,
+      loading: false,
+      noMore: false
+    }
+  },
+  computed: {
+    disabled () {
+      return this.loading || this.noMore
     }
   },
   methods: {
+    load () {
+      console.log(99)
+      this.init()
+    },
     rightDatas () {
       home({ u_id: this.$route.params.u_id }).then(res => {
         if (res.code === 0) {
@@ -94,12 +108,18 @@ export default {
       })
     },
     init () {
-      findArticle({ u_id: this.$route.params.u_id, type: this.$route.params.type }).then(res => {
+      this.loading = true
+      findArticle({ u_id: this.$route.params.u_id, type: this.$route.params.type, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 0) {
           res.data.forEach(item => {
             item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
           })
-          this.$store.state.articleLists = res.data
+          this.$store.state.articleLists = [...this.$store.state.articleLists, ...res.data]
+          if (res.data.length < this.limit) {
+            this.noMore = true
+          }
+          this.loading = false
+          this.page++
         }
       })
     },
@@ -114,9 +134,6 @@ export default {
     }
   },
   mounted () {
-    if (!this.$store.state.articleLists.length) {
-      this.init()
-    }
     this.rightDatas()
   }
 }

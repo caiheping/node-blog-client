@@ -8,7 +8,7 @@
         <el-form-item label="前言" :label-width="formLabelWidth" prop="preface">
           <el-input v-model="form.preface" type="textarea" autocomplete="off" placeholder="请输入前言"></el-input>
         </el-form-item>
-        <el-form-item label="封面图片" :label-width="formLabelWidth" prop="title">
+        <el-form-item label="封面图片" :label-width="formLabelWidth" prop="cover_photo">
           <el-upload
             :action="uploadUrl"
             :on-success="uploadSuccess"
@@ -16,6 +16,7 @@
             :show-file-list="false">
             <el-button type="primary">上传图片</el-button>
           </el-upload>
+          <el-input v-model="form.cover_photo" style="display: none;" disabled></el-input>
           <img :src="form.cover_photo" alt="">
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth" prop="type">
@@ -24,7 +25,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="内容" :label-width="formLabelWidth" prop="content">
-          <tinymce-editor ref="tinymce" :data="form.content"></tinymce-editor>
+          <el-input v-model="form.content" style="display: none;" disabled></el-input>
+          <tinymce-editor ref="tinymce" :data="form.content" @textChange="contentChange"></tinymce-editor>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,8 +160,11 @@ export default {
         preface: [
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入前言' }
         ],
+        cover_photo: [
+          { required: true, validator: rules.string, trigger: 'change', message: '请上传封面图' }
+        ],
         content: [
-          { required: true, validator: rules.string, trigger: 'blur', message: '请输入内容' }
+          { required: true, validator: rules.string, trigger: 'change', message: '请输入内容' }
         ],
         type: [
           { required: true, validator: rules.string, trigger: 'change', message: '请选择类型' }
@@ -170,7 +175,7 @@ export default {
         title: '',
         preface: '',
         cover_photo: '',
-        content: '本地图片上传功能仅为演示，实际使用需要补全图片存储地址',
+        content: '',
         type: ''
       },
       findQuery: {
@@ -183,6 +188,9 @@ export default {
     }
   },
   methods: {
+    contentChange (val) {
+      this.form.content = val
+    },
     // 上传成功
     uploadSuccess (response, file, fileList) {
       this.form.cover_photo = response.data.url
@@ -252,8 +260,8 @@ export default {
       this.form = {
         id: null,
         title: '',
-        cover_photo: require('../../../static/img/avater.jpg'),
-        content: '本地图片上传功能仅为演示，实际使用需要补全图片存储地址',
+        cover_photo: '',
+        content: '',
         type: this.typeArr[0].title
       }
       this.$refs.form.clearValidate()
@@ -355,7 +363,7 @@ export default {
       overflow: auto;
       margin-bottom: 50px;
       img{
-        width: 200px;
+        width: 100%;
       }
     }
     .page{

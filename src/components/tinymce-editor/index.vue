@@ -47,6 +47,11 @@ export default {
       uploadUrl: '/uploadImg'
     }
   },
+  watch: {
+    content () {
+      this.$emit('textChange', this.content)
+    }
+  },
   methods: {
     // 插入图片至编辑器
     insertImage (res, file) {
