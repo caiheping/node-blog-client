@@ -42,7 +42,7 @@ export function updateSkill (query = {}) {
   return httpRequest('/admin/user/updateSkill', 'post', query)
 }
 
-// 查询个人笔记
+// 查询个人日志
 export function findNote (query = {}) {
   return httpRequest('/admin/user/findNote', 'get', query)
 }

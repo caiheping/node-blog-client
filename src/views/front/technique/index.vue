@@ -1,8 +1,8 @@
 <template>
   <div class="technique">
     <div class="left">
-      <ul class="infinite-list article" infinite-scroll-disabled="disabled" v-infinite-scroll="load">
-        <li v-for="item in $store.state.articleLists" :key="item.id">
+      <ul class="infinite-list article" :infinite-scroll-disabled="disabled" v-infinite-scroll="load">
+        <li v-for="item in articleLists" :key="item.id">
           <div class="item" @click.prevent="toDetail(item.id)">
             <header>
               <h2>
@@ -37,8 +37,8 @@
           </div>
         </li>
       </ul>
-      <p v-if="loading">加载中...</p>
-      <p v-if="noMore">没有更多了</p>
+      <p v-if="loading" class="loading">加载中...</p>
+      <p v-if="noMore" class="noMore">没有更多了</p>
     </div>
     <div class="right">
       <div class="other">
@@ -81,9 +81,10 @@ export default {
   data () {
     return {
       page: 1,
-      limit: 1,
+      limit: 10,
       loading: false,
-      noMore: false
+      noMore: false,
+      articleLists: []
     }
   },
   computed: {
@@ -91,9 +92,15 @@ export default {
       return this.loading || this.noMore
     }
   },
+  watch: {
+    $route: function (oldVal, newVal) {
+      this.articleLists = []
+      this.page = 1
+      this.init()
+    }
+  },
   methods: {
     load () {
-      console.log(99)
       this.init()
     },
     rightDatas () {
@@ -109,12 +116,13 @@ export default {
     },
     init () {
       this.loading = true
+      this.noMore = false
       findArticle({ u_id: this.$route.params.u_id, type: this.$route.params.type, page: this.page, limit: this.limit }).then(res => {
         if (res.code === 0) {
           res.data.forEach(item => {
             item.createdAt = moment(item.createdAt).format('YYYY-MM-DD')
           })
-          this.$store.state.articleLists = [...this.$store.state.articleLists, ...res.data]
+          this.articleLists = [...this.articleLists, ...res.data]
           if (res.data.length < this.limit) {
             this.noMore = true
           }
@@ -124,7 +132,6 @@ export default {
       })
     },
     toDetail (id) {
-      console.log(this.$route.params.u_id)
       this.$router.push({
         path: `/layout/detail/${this.$route.params.u_id}`,
         query: {
@@ -230,6 +237,16 @@ export default {
             }
           }
         }
+      }
+      .loading{
+        text-align: center;
+        line-height: 40px;
+        color: #999;
+      }
+      .noMore{
+        text-align: center;
+        line-height: 40px;
+        color: #999;
       }
     }
     .right{

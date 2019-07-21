@@ -7,6 +7,10 @@ export default new Router({
   mode: 'hash',
   routes: [
     {
+      path: '/',
+      redirect: '/login'
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/admin/login/index.vue'),
@@ -42,7 +46,7 @@ export default new Router({
           component: () => import('../views/front/technique/index.vue'),
           meta: {
             title: '技术杂谈',
-            keepAlive: true
+            keepAlive: false
           }
         },
         {
@@ -78,7 +82,7 @@ export default new Router({
           name: 'adminHome',
           component: () => import('../views/admin/home/index.vue'),
           meta: {
-            title: '首页',
+            title: '后台管理',
             keepAlive: true
           }
         },
@@ -114,7 +118,7 @@ export default new Router({
           name: 'note',
           component: () => import('../views/admin/user/note.vue'),
           meta: {
-            title: '个人笔记',
+            title: '个人日志',
             keepAlive: true
           }
         },

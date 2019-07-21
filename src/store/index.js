@@ -14,7 +14,6 @@ export default new Vuex.Store({
     requestTime: '',
     minLoading: 500,
     loading: false,
-    articleLists: [],
     userInfo: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')) : null,
     baseDatas: {}
   },

@@ -26,11 +26,11 @@
                 <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <div class="note" v-html="item.content"></div>
+            <div class="note">{{item.preface}}</div>
             <p class="auth-span">
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
-                {{nickname}}
+                {{$store.state.userInfo.nickname}}
               </span>
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
@@ -88,7 +88,6 @@ import moment from 'moment'
 export default {
   data () {
     return {
-      nickname: sessionStorage.getItem('userInfo') ? JSON.parse(sessionStorage.getItem('userInfo')).nickname : '',
       datas: {}
     }
   },

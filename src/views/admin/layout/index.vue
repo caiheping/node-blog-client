@@ -37,7 +37,7 @@
                   <span slot="title">个人简介</span>
                 </el-menu-item>
                 <el-menu-item index="note">
-                  <span slot="title">个人笔记</span>
+                  <span slot="title">个人日志</span>
                 </el-menu-item>
               </el-submenu>
               <el-submenu index="other" v-if="!isAdmin">
