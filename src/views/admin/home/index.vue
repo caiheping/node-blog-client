@@ -1,14 +1,14 @@
 <template>
-  <div class="home">
-    <p v-if="!isAdmin" class="link">博客链接: http://{{host}}/#/layout/home/{{this.$store.state.userInfo.id}}</p>
+  <div class="home" v-if="homeData">
+    <p v-if="isAdmin !== 'true'" class="link">博客链接: http://{{host}}/#/layout/home/{{this.$store.state.userInfo.id}}</p>
     <div class="top">
-      <div class="item" v-if="isAdmin">
+      <div class="item" v-if="isAdmin === 'true'">
         <div class="content">
           <div class="itemLogo">
             用户量
           </div>
           <div class="right">
-            <countTo class="num" :startVal='0' :endVal='353' :duration='2000'></countTo>
+            <countTo class="num" :startVal='0' :endVal='homeData.allUser' :duration='2000'></countTo>
           </div>
         </div>
       </div>
@@ -18,7 +18,7 @@
             文章
           </div>
           <div class="right">
-            <countTo class="num" :startVal='0' :endVal='353' :duration='2000'></countTo>
+            <countTo class="num" :startVal='0' :endVal='homeData.allArticle' :duration='2000'></countTo>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
             个人日志
           </div>
           <div class="right">
-            <countTo class="num" :startVal='0' :endVal='3333' :duration='2000'></countTo>
+            <countTo class="num" :startVal='0' :endVal='homeData.allNote' :duration='2000'></countTo>
           </div>
         </div>
       </div>
@@ -43,7 +43,8 @@ export default {
   data () {
     return {
       host: window.location.host,
-      isAdmin: false
+      isAdmin: JSON.parse(sessionStorage.getItem('userInfo')).level === 0 ? 'true' : 'false',
+      homeData: null
     }
   },
   components: {
@@ -53,15 +54,13 @@ export default {
     getDatas () {
       home({ id: this.$store.state.userInfo.id }).then(res => {
         console.log(res)
+        if (res.code === 0) {
+          this.homeData = res.data
+        }
       })
     }
   },
   mounted () {
-    if (this.$store.state.userInfo.level === 0) {
-      this.isAdmin = true
-    } else {
-      this.isAdmin = false
-    }
     this.getDatas()
   }
 }

@@ -38,15 +38,15 @@
       <div v-html="articleData.content"></div>
       <p class="other">转载请注明：{{$store.state.userInfo.nickname}} » {{articleData.title}}</p>
       <div class="bottom">
-        <el-button type="primary">喜欢</el-button>
-        <el-button type="primary">分享</el-button>
+        <el-button type="primary" @click="like">喜欢</el-button>
+        <el-button>分享</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { findArticleById } from '../../../api/front/article'
+import { findArticleById, setBrowse, articleLike } from '../../../api/front/article'
 import moment from 'moment'
 export default {
   data () {
@@ -55,6 +55,16 @@ export default {
     }
   },
   methods: {
+    like () {
+      articleLike({ a_id: this.$route.query.id }).then(res => {
+        if (res.code === 0) {
+          this.getDetail()
+        }
+      })
+    },
+    browse () {
+      setBrowse({ a_id: this.$route.query.id })
+    },
     getDetail () {
       findArticleById({ id: this.$route.query.id, u_id: this.$route.params.u_id }).then(res => {
         console.log(res)
@@ -67,6 +77,7 @@ export default {
   },
   mounted () {
     this.getDetail()
+    this.browse()
   }
 }
 </script>

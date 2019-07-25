@@ -14,3 +14,13 @@ export function findArticle (query = {}) {
 export function findArticleById (query = {}) {
   return httpRequest('/fornt/article/findArticleById', 'get', query)
 }
+
+// 通过id查询文章
+export function setBrowse (query = {}) {
+  return httpRequest('/fornt/article/setBrowse', 'post', query)
+}
+
+// 喜欢
+export function articleLike (query = {}) {
+  return httpRequest('/front/article/like', 'post', query)
+}
