@@ -3,7 +3,7 @@ import qs from 'qs'
 import store from '@/store'
 import { Message } from 'element-ui'
 import router from '../router'
-import { baseUrl } from './config'
+import config from './config'
 
 axios.defaults.withCredentials = true
 
@@ -68,7 +68,7 @@ function httpRequest (url, method = 'GET', params = {}, contentType = '', isLoad
   }
   // 设置token
   if (process.env.NODE_ENV === 'development') {
-    url = baseUrl + url
+    url = config.baseUrl + url
   }
   method = method.toUpperCase()
   let httpDefault = {

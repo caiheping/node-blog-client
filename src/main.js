@@ -5,7 +5,7 @@ import store from './store/index'
 import VueParticles from 'vue-particles'
 import ElementUI from 'element-ui'
 
-import { baseUrl } from './utils/config'
+import config from './utils/config'
 
 import '@/static/icons'
 
@@ -18,7 +18,7 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
-Vue.prototype.baseUrl = baseUrl
+Vue.prototype.baseUrl = config.baseUrl
 
 router.beforeEach((to, from, next) => {
   let len = store.state.TagsViews.filter(item => item.title === to.meta.title)
