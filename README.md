@@ -13,6 +13,8 @@
 
 #### 前端项目运行
 ```
+git clone https://github.com/caiheping/node-blog-client.git
+cd ./node-blog-client
 npm install
 npm run serve
 ```

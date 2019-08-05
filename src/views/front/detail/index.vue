@@ -1,5 +1,5 @@
 <template>
-  <div class="detail">
+  <div class="detail" v-loading="$store.state.loading">
     <div class="top">
       <div class="breadcrumb">
         <el-breadcrumb separator="/">
@@ -38,7 +38,7 @@
       <div v-html="articleData.content"></div>
       <p class="other">转载请注明：{{$store.state.userInfo.nickname}} » {{articleData.title}}</p>
       <div class="bottom">
-        <el-button type="primary" @click="like">喜欢</el-button>
+        <el-button type="primary" @click="like" :disabled="isLike">喜欢</el-button>
         <el-button>分享</el-button>
       </div>
     </div>
@@ -46,37 +46,45 @@
 </template>
 
 <script>
-import { findArticleById, setBrowse, articleLike } from '../../../api/front/article'
+import { findArticleById, setBrowse, articleLike, getIp } from '../../../api/front/article'
 import moment from 'moment'
 export default {
   data () {
     return {
-      articleData: {}
+      articleData: {},
+      ip: '',
+      isLike: false
     }
   },
   methods: {
     like () {
-      articleLike({ a_id: this.$route.query.id }).then(res => {
+      articleLike({ a_id: this.$route.query.id, ip: this.ip }).then(res => {
         if (res.code === 0) {
           this.getDetail()
         }
       })
     },
     browse () {
-      setBrowse({ a_id: this.$route.query.id })
+      getIp().then(res => {
+        this.ip = res.cip
+        setBrowse({ a_id: this.$route.query.id, ip: this.ip })
+        this.getDetail()
+      })
     },
     getDetail () {
       findArticleById({ id: this.$route.query.id, u_id: this.$route.params.u_id }).then(res => {
-        console.log(res)
         if (res.code === 0) {
           this.articleData = res.data
           this.articleData.createdAt = moment(res.data.createdAt).format('YYYY-MM-DD')
+          let len = res.data.Ips.filter(item => this.ip === item.ip && item.is_love !== 0).length
+          if (len) {
+            this.isLike = true
+          }
         }
       })
     }
   },
   mounted () {
-    this.getDetail()
     this.browse()
   }
 }

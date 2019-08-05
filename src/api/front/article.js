@@ -24,3 +24,8 @@ export function setBrowse (query = {}) {
 export function articleLike (query = {}) {
   return httpRequest('/front/article/like', 'post', query)
 }
+
+// 获取ip
+export function getIp (query = {}) {
+  return httpRequest('/fornt/getIp', 'get', query)
+}
