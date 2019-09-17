@@ -76,10 +76,10 @@ function httpRequest (url, method = 'GET', params = {}, contentType = '', isLoad
     url: url,
     headers: {
       withCredentials: true,
-      'Content-Type': contentType === 'json' ? 'application/json; charset=utf-8' : 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json;charset=utf-8'
     },
     params: method === 'GET' || method === 'DELETE' ? params : null,
-    data: method === 'POST' || method === 'PUT' ? (contentType === 'json' ? params : qs.stringify(params)) : null,
+    data: method === 'POST' || method === 'PUT' ? params : null,
     timeout: 10000
   }
 

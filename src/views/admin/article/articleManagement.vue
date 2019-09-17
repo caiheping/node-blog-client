@@ -1,6 +1,6 @@
 <template>
   <div class="articleManagement">
-    <el-dialog title="新增" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
+    <el-dialog title="新增" v-if="dialogFormVisible" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
       <el-form :model="form" ref="form" :rules="rules">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input v-model="form.title" autocomplete="off" placeholder="请输入标题"></el-input>
@@ -11,13 +11,14 @@
         <el-form-item label="封面图片" :label-width="formLabelWidth" prop="cover_photo">
           <el-upload
             :action="uploadUrl"
-            :on-success="uploadSuccess"
-            :on-error="uploadError"
-            :show-file-list="false">
-            <el-button type="primary">上传图片</el-button>
+            :on-change="handleChange"
+            :show-file-list="false"
+            list-type="picture"
+            :auto-upload="false">
+            <img v-if="uploadObj.cover_photo" :src="uploadObj.cover_photo" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
           <el-input v-model="form.cover_photo" style="display: none;" disabled></el-input>
-          <img :src="form.cover_photo" alt="">
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth" prop="type">
           <el-select v-model="form.type" placeholder="请选择类型">
@@ -140,6 +141,10 @@ export default {
   components: { TinymceEditor },
   data () {
     return {
+      uploadObj: {
+        file: null,
+        cover_photo: null
+      },
       uploadUrl: '/uploadImg',
       title: '新增',
       total: 0,
@@ -191,10 +196,15 @@ export default {
     contentChange (val) {
       this.form.content = val
     },
+    handleChange (file, fileList) {
+      console.log(file)
+      this.uploadObj.cover_photo = file.url
+      this.form.cover_photo = file.url
+      this.uploadObj.file = file.raw
+    },
     // 上传成功
     uploadSuccess (response, file, fileList) {
-      this.form.cover_photo = response.data.url
-      console.log(response)
+      this.cover_photo = response.data.url
       this.$message({
         type: 'success',
         message: '上传成功'
@@ -217,17 +227,15 @@ export default {
       let _this = this
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log(_this.$refs.tinymce.content)
-          let query = {
-            title: _this.form.title,
-            preface: _this.form.preface,
-            content: _this.$refs.tinymce.content,
-            type: _this.form.type,
-            cover_photo: _this.form.cover_photo
-          }
+          let formData = new FormData()
+          formData.append('file', _this.uploadObj.file)
+          formData.append('title', _this.form.title)
+          formData.append('preface', _this.form.preface)
+          formData.append('content', _this.$refs.tinymce.content)
+          formData.append('type', _this.form.type)
           if (_this.form.id) {
-            query.id = _this.form.id
-            updateArticle(query).then(res => {
+            formData.append('id', _this.form.id)
+            updateArticle(formData).then(res => {
               console.log(res)
               if (res.code === 0) {
                 _this.$message({
@@ -238,8 +246,8 @@ export default {
               _this.getDatas()
             })
           } else {
-            query.u_id = JSON.parse(sessionStorage.getItem('userInfo')).id
-            addArticle(query).then(res => {
+            formData.append('u_id', JSON.parse(sessionStorage.getItem('userInfo')).id)
+            addArticle(formData).then(res => {
               console.log(res)
               if (res.code === 0) {
                 _this.$message({
@@ -257,14 +265,7 @@ export default {
       })
     },
     closeDialog () {
-      this.form = {
-        id: null,
-        title: '',
-        cover_photo: '',
-        content: '',
-        type: this.typeArr[0].title
-      }
-      this.$refs.form.clearValidate()
+      this.$refs.form.resetFields()
     },
     getTypes () {
       findArticleType({ u_id: JSON.parse(sessionStorage.getItem('userInfo')).id }).then(res => {
@@ -287,6 +288,7 @@ export default {
     add () {
       this.form.id = null
       this.title = '新增'
+      this.uploadObj.cover_photo = null
       this.dialogFormVisible = true
     },
     edit (row) {
@@ -296,7 +298,7 @@ export default {
       this.form.type = row.type
       this.form.title = row.title
       this.form.preface = row.preface
-      this.form.cover_photo = row.cover_photo
+      this.uploadObj.cover_photo = row.cover_photo
       this.form.content = row.content
       this.dialogFormVisible = true
     },
@@ -377,6 +379,28 @@ export default {
       bottom: 0;
       left: 0;
       z-index: 999;
+    }
+    .avatar-uploader .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+      border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 125px;
+      height: 100px;
+      line-height: 100px;
+      text-align: center;
+    }
+    .avatar {
+      width: 100%;
+      display: block;
     }
   }
 </style>
