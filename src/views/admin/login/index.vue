@@ -81,6 +81,7 @@ export default {
           login(this.loginForm).then(res => {
             if (res.code === 0) {
               sessionStorage.setItem('userInfo', JSON.stringify(res.data.userInfo))
+              _this.$store.state.userInfo = res.data.userInfo
               _this.$router.push('/adminLayout/adminHome')
             }
           })

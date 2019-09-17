@@ -15,7 +15,7 @@
                 <img :src="item.cover_photo" alt="">
               </a>
             </div>
-            <span class="note" v-html="item.content"></span>
+            <span class="note">{{item.preface}}</span>
             <p class="auth-span">
               <span class="muted">
                 <i class="el-icon-s-custom"></i>
