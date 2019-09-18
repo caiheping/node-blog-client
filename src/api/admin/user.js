@@ -5,6 +5,11 @@ export function findUser (query = {}) {
   return httpRequest('/admin/user/findUser', 'get', query)
 }
 
+// 通過id查询用户
+export function findUserById (query = {}) {
+  return httpRequest('/admin/user/findUserById', 'get', query)
+}
+
 // 添加用户
 export function addUser (query = {}) {
   return httpRequest('/admin/user/addUser', 'post', query)

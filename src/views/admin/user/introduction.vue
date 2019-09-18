@@ -1,13 +1,14 @@
 <template>
   <div class="introduction">
-    <div class="avatar">
-      <img :src="formObj.avatar" alt="">
+    <div class="avatarBox">
       <el-upload
         :action="uploadUrl"
-        :on-success="uploadSuccess"
-        :on-error="uploadError"
-        :show-file-list="false">
-        <el-button type="primary">上传头像</el-button>
+        :on-change="handleChange"
+        :show-file-list="false"
+        list-type="picture"
+        :auto-upload="false">
+        <img v-if="uploadObj.avatar" :src="uploadObj.avatar" class="avatar">
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
     </div>
     <el-form label-width="100px" :model="formObj">
@@ -79,10 +80,14 @@
 
 <script>
 import { rules } from '@/utils/validate'
-import { updateUserInfo, findSkill, addSkill, deleteSkill, updateSkill } from '../../../api/admin/user'
+import { updateUserInfo, findSkill, addSkill, deleteSkill, updateSkill, findUserById } from '../../../api/admin/user'
 export default {
   data () {
     return {
+      uploadObj: {
+        file: null,
+        avatar: null
+      },
       title: '新增',
       uploadUrl: '/uploadImg',
       skillArr: [
@@ -93,7 +98,6 @@ export default {
       ],
       formObj: {
         id: '',
-        avatar: '',
         nickname: '',
         motto: '',
         hobby: '',
@@ -122,20 +126,9 @@ export default {
     }
   },
   methods: {
-    // 上传成功
-    uploadSuccess (response, file, fileList) {
-      this.formObj.avatar = response.data.url
-      this.$message({
-        type: 'success',
-        message: '上传成功'
-      })
-    },
-    // 上传失败
-    uploadError (err, file, fileList) {
-      this.$message({
-        type: 'error',
-        message: err.message
-      })
+    handleChange (file, fileList) {
+      this.uploadObj.avatar = file.url
+      this.uploadObj.file = file.raw
     },
     submit (formName) {
       let _this = this
@@ -194,19 +187,36 @@ export default {
         }
       })
     },
+    initUser () {
+      let query = {
+        u_id: JSON.parse(sessionStorage.getItem('userInfo')).id
+      }
+      console.log(JSON.parse(sessionStorage.getItem('userInfo')))
+      findUserById(query).then(res => {
+        if (res.code === 0) {
+          for (let k in this.formObj) {
+            this.formObj[k] = res.data.userInfo[k]
+          }
+          this.uploadObj.avatar = res.data.userInfo.avatar
+          sessionStorage.setItem('userInfo', JSON.stringify(res.data.userInfo))
+        }
+      })
+    },
     updateUser () {
-      updateUserInfo(this.formObj).then(res => {
-        console.log(res)
+      let formData = new FormData()
+      if (this.uploadObj.file) {
+        formData.append('file', this.uploadObj.file)
+      }
+      for (let k in this.formObj) {
+        formData.append(k, this.formObj[k])
+      }
+      updateUserInfo(formData).then(res => {
         if (res.code === 0) {
           this.$message({
             type: 'success',
             message: res.data
           })
-          let userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
-          for (let k in this.formObj) {
-            userInfo[k] = this.formObj[k]
-          }
-          sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
+          this.initUser()
         }
       })
     },
@@ -257,10 +267,7 @@ export default {
   },
   mounted () {
     this.uploadUrl = this.baseUrl + this.uploadUrl
-    let userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
-    for (let k in this.formObj) {
-      this.formObj[k] = userInfo[k]
-    }
+    this.initUser()
     this.getSkill()
   }
 }
@@ -270,17 +277,33 @@ export default {
   .introduction{
     padding: 30px;
     box-sizing: border-box;
-    .avatar{
+    .avatarBox{
       margin: 0 auto 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      img{
+      .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+      }
+      .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 125px;
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+      }
+      .avatar {
+        width: 100%;
         display: block;
-        width: 200px;
-        margin-bottom: 20px;
-        border-radius: 5px;
       }
     }
     .skill{

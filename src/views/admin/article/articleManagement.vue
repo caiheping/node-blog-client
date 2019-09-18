@@ -202,22 +202,6 @@ export default {
       this.form.cover_photo = file.url
       this.uploadObj.file = file.raw
     },
-    // 上传成功
-    uploadSuccess (response, file, fileList) {
-      this.cover_photo = response.data.url
-      this.$message({
-        type: 'success',
-        message: '上传成功'
-      })
-    },
-    // 上传失败
-    uploadError (err, file, fileList) {
-      this.$message({
-        type: 'error',
-        message: '上传失败'
-      })
-      console.log(err)
-    },
     find () {
       this.findQuery.type = this.fromObj.type
       this.findQuery.title = this.fromObj.title

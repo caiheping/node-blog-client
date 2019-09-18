@@ -8,12 +8,14 @@
         <el-form-item label="链接地址" :label-width="formLabelWidth" prop="url">
           <el-upload
             :action="uploadUrl"
-            :on-success="uploadSuccess"
-            :on-error="uploadError"
-            :show-file-list="false">
-            <el-button type="primary">上传图片</el-button>
+            :on-change="handleChange"
+            :show-file-list="false"
+            list-type="picture"
+            :auto-upload="false">
+            <img v-if="uploadObj.url" :src="uploadObj.url" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
-          <img :src="form.url" alt="">
+          <el-input v-model="form.url" style="display: none;" disabled></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -48,12 +50,16 @@
         <el-table-column
           prop="index"
           align="center"
-          label="图片索引">
+          label="图片索引"
+          width="100">
         </el-table-column>
         <el-table-column
           prop="url"
           align="center"
-          label="链接地址">
+          label="图片">
+          <template slot-scope="scope">
+            <img :src="scope.row.url" alt="">
+          </template>
         </el-table-column>
         <el-table-column
           label="操作"
@@ -75,6 +81,10 @@ import { findBanner, addBanner, deleteBanner, updateBanner } from '../../../api/
 export default {
   data () {
     return {
+      uploadObj: {
+        file: null,
+        url: null
+      },
       uploadUrl: '/uploadImg',
       title: '新增',
       fromObj: {
@@ -85,7 +95,7 @@ export default {
       formLabelWidth: '100px',
       rules: {
         index: [
-          { required: true, validator: rules.string, trigger: 'blur', message: '请输入索引' }
+          { required: true, validator: rules.number, trigger: 'blur', message: '请输入索引' }
         ],
         url: [
           { required: true, validator: rules.string, trigger: 'blur', message: '请输入url地址' }
@@ -103,6 +113,12 @@ export default {
     }
   },
   methods: {
+    handleChange (file, fileList) {
+      console.log(file)
+      this.uploadObj.url = file.url
+      this.form.url = file.url
+      this.uploadObj.file = file.raw
+    },
     // 上传成功
     uploadSuccess (response, file, fileList) {
       this.form.url = response.data.url
@@ -132,13 +148,12 @@ export default {
       let _this = this
       this.$refs[formName].validate(valid => {
         if (valid) {
-          let query = {
-            url: _this.form.url,
-            index: _this.form.index
-          }
+          let formData = new FormData()
+          formData.append('file', _this.uploadObj.file)
+          formData.append('index', _this.form.index)
           if (_this.form.id) {
-            query.id = _this.form.id
-            updateBanner(query).then(res => {
+            formData.append('id', _this.form.id)
+            updateBanner(formData).then(res => {
               console.log(res)
               if (res.code === 0) {
                 _this.$message({
@@ -149,8 +164,8 @@ export default {
               _this.getDatas()
             })
           } else {
-            query.u_id = JSON.parse(sessionStorage.getItem('userInfo')).id
-            addBanner(query).then(res => {
+            formData.append('u_id', JSON.parse(sessionStorage.getItem('userInfo')).id)
+            addBanner(formData).then(res => {
               console.log(res)
               if (res.code === 0) {
                 _this.$message({
@@ -182,12 +197,15 @@ export default {
     add () {
       this.form.id = null
       this.title = '新增'
+      this.uploadObj.url = null
       this.dialogFormVisible = true
     },
     edit (row) {
+      console.log(row)
       this.form.id = row.id
       this.title = '修改'
       this.form.index = row.index
+      this.uploadObj.url = row.url
       this.form.url = row.url
       this.dialogFormVisible = true
     },
@@ -252,6 +270,29 @@ export default {
       bottom: 0;
       left: 0;
       z-index: 999;
+    }
+
+    .avatar-uploader .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+      border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 125px;
+      height: 100px;
+      line-height: 100px;
+      text-align: center;
+    }
+    .avatar {
+      width: 100%;
+      display: block;
     }
   }
 </style>
