@@ -56,7 +56,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 50]"
+        :page-sizes="[1, 20, 30, 50]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
@@ -74,7 +74,7 @@ export default {
       title: '新增',
       total: 0,
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 1,
       fromObj: {
         type: ''
       },
@@ -94,7 +94,7 @@ export default {
         u_id: JSON.parse(sessionStorage.getItem('userInfo')).id,
         title: null,
         page: 1,
-        limit: 10
+        limit: 1
       }
     }
   },
@@ -167,6 +167,10 @@ export default {
               type: 'success',
               message: res.data
             })
+            if (this.findQuery.page > 1) {
+              this.currentPage -= 1
+              this.findQuery.page -= 1
+            }
             _this.getDatas()
           }
         })

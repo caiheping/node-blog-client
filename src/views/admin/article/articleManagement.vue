@@ -299,6 +299,10 @@ export default {
               type: 'success',
               message: res.data
             })
+            if (this.findQuery.page > 1) {
+              this.currentPage -= 1
+              this.findQuery.page -= 1
+            }
             _this.getDatas()
           }
         })

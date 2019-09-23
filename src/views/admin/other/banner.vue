@@ -119,23 +119,6 @@ export default {
       this.form.url = file.url
       this.uploadObj.file = file.raw
     },
-    // 上传成功
-    uploadSuccess (response, file, fileList) {
-      this.form.url = response.data.url
-      console.log(response)
-      this.$message({
-        type: 'success',
-        message: '上传成功'
-      })
-    },
-    // 上传失败
-    uploadError (err, file, fileList) {
-      this.$message({
-        type: 'error',
-        message: '上传失败'
-      })
-      console.log(err)
-    },
     closeDialog () {
       this.$refs.form.clearValidate()
       this.form = {
