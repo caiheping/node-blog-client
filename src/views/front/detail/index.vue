@@ -74,6 +74,7 @@ export default {
     getDetail () {
       findArticleById({ id: this.$route.query.id, u_id: this.$route.params.u_id }).then(res => {
         if (res.code === 0) {
+          console.log(res)
           this.articleData = res.data
           this.articleData.createdAt = moment(res.data.createdAt).format('YYYY-MM-DD')
           let len = res.data.Ips.filter(item => this.ip === item.ip && item.is_love !== 0).length

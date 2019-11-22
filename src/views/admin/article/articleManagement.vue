@@ -1,6 +1,6 @@
 <template>
   <div class="articleManagement">
-    <el-dialog title="新增" v-if="dialogFormVisible" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
+    <el-dialog title="新增" :visible.sync="dialogFormVisible" @close="closeDialog" class="dialog">
       <el-form :model="form" ref="form" :rules="rules">
         <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
           <el-input v-model="form.title" autocomplete="off" placeholder="请输入标题"></el-input>
@@ -18,7 +18,7 @@
             <img v-if="uploadObj.cover_photo" :src="uploadObj.cover_photo" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
-          <el-input v-model="form.cover_photo" style="display: none;" disabled></el-input>
+          <el-input v-model="form.cover_photo" style="display: none" disabled></el-input>
         </el-form-item>
         <el-form-item label="类型" :label-width="formLabelWidth" prop="type">
           <el-select v-model="form.type" placeholder="请选择类型">
@@ -209,6 +209,7 @@ export default {
     },
     submit (formName) {
       let _this = this
+      console.log(this.form)
       this.$refs[formName].validate(valid => {
         if (valid) {
           let formData = new FormData()
@@ -249,6 +250,14 @@ export default {
       })
     },
     closeDialog () {
+      this.form = {
+        id: null,
+        title: '',
+        preface: '',
+        cover_photo: '',
+        content: '',
+        type: ''
+      }
       this.$refs.form.resetFields()
     },
     getTypes () {
@@ -282,6 +291,7 @@ export default {
       this.form.type = row.type
       this.form.title = row.title
       this.form.preface = row.preface
+      this.form.cover_photo = row.cover_photo
       this.uploadObj.cover_photo = row.cover_photo
       this.form.content = row.content
       this.dialogFormVisible = true

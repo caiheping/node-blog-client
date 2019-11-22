@@ -100,11 +100,11 @@ export default {
   },
   methods: {
     closeDialog () {
-      this.$refs.form.clearValidate()
       this.form = {
         id: null,
         type: ''
       }
+      this.$refs.form.clearValidate()
     },
     find () {
       this.findQuery.title = this.fromObj.type

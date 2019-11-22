@@ -16,7 +16,7 @@
         </ul>
       </div>
       <ul class="article">
-        <li v-for="item in datas.articles" :key="item.id" @click.prevent="toDetail">
+        <li v-for="item in datas.articles" :key="item.id" @click.prevent="toDetail(item)">
           <div class="item">
             <header>
               <h2>{{item.title}}</h2>
@@ -56,7 +56,7 @@
       <div class="love">
         <h4>猜你喜欢</h4>
         <ul>
-          <li v-for="item in $store.state.baseDatas.loves" :key="item.id" @click.prevent="toDetail">
+          <li v-for="item in $store.state.baseDatas.loves" :key="item.id" @click.prevent="toDetail(item)">
             <a href="">
               <img :src="item.cover_photo" alt="">
             </a>
@@ -110,11 +110,11 @@ export default {
         }
       })
     },
-    toDetail () {
+    toDetail (item) {
       this.$router.push({
         path: `/layout/detail/${this.$route.params.u_id}`,
         query: {
-          id: 1
+          id: item.id
         }
       })
     }

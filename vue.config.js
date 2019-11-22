@@ -6,8 +6,9 @@ function resolve (dir) {
 
 module.exports = {
   publicPath: './',
-  baseUrl: process.env.NODE_ENV === 'production' ? '/blog/' : '/',
   lintOnSave: false,
+  // 打包时不生成.map文件
+  productionSourceMap: false,
   chainWebpack: (config) => {
     // 配置静态资源图片
     config.module.rules.delete('images')
