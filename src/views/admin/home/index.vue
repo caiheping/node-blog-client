@@ -1,6 +1,8 @@
 <template>
   <div class="home" v-if="homeData">
-    <p v-if="isAdmin !== 'true'" class="link">博客链接: http://{{host}}/#/layout/home/{{this.$store.state.userInfo.id}}</p>
+    <p v-if="isAdmin !== 'true'" class="link">
+      <router-link :to="`/layout/home/${this.$store.state.userInfo.id}`">点击去我的博客</router-link>
+    </p>
     <div class="top">
       <div class="item" v-if="isAdmin === 'true'">
         <div class="content">
