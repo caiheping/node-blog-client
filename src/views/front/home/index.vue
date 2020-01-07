@@ -3,7 +3,7 @@
     <div class="left">
       <el-carousel :interval="5000" arrow="always">
         <el-carousel-item v-for="item in datas.banners" :key="item.id">
-          <img :src="item.url" alt="">
+          <img class="banner" :src="item.url" alt="">
         </el-carousel-item>
       </el-carousel>
       <div class="hot">
@@ -148,6 +148,11 @@ export default {
     display: flex;
     .left{
       flex: 1;
+      .banner{
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
       .hot{
         background: #fff;
         padding: 0 20px;
