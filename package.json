@@ -15,7 +15,7 @@
     "moment": "^2.24.0",
     "qs": "^6.7.0",
     "screenfull": "^4.2.0",
-    "tinymce": "^5.0.8",
+    "tinymce": "^5.2.2",
     "vue": "^2.6.10",
     "vue-count-to": "^1.0.13",
     "vue-particles": "^1.0.9",
